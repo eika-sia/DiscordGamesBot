@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const { prefix, token } = require('./config.json');
+const { prefix } = require('./config.json');
 const client = new Discord.Client();
 const fs = require('fs');
 const ytdl = require('ytdl-core');
@@ -40,4 +40,4 @@ client.on('message', async message => {
 	}
 });
 
-client.login(token);
+client.login(process.env.token);

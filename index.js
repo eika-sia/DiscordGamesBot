@@ -1,8 +1,7 @@
 const Discord = require('discord.js');
 const { prefix } = require('./config.json');
 const client = new Discord.Client();
-const fs = require('fs');
-const ytdl = require('ytdl-core');
+const fs= require('fs');
 
 client.commands = new Discord.Collection();
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));

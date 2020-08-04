@@ -1,9 +1,9 @@
 module.exports.run = async (bot, msg, args, db) => {
-
+	var Owner;
 	db.collection('guilds').doc(msg.guild.id).get().then((q) => {
         if (q.exists) {
             if(q.data().guildOwnerID === msg.author.id) {
-                var Owner = q.data().guildOwnerID;
+            	Owner = q.data().guildOwnerID;
             }
         }
     })

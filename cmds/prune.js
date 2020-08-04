@@ -1,14 +1,7 @@
-module.exports.run = async (bot, msg, args, db) => {
+module.exports.run = async (bot, msg, args, db, UserId) => {
 	var Owner;
-	db.collection('guilds').doc(msg.guild.id).get().then((q) => {
-        if (q.exists) {
-            if(q.data().guildOwnerID === msg.author.id) {
-            	Owner = q.data().guildOwnerID;
-            }
-        }
-    })
 
-    if(msg.member === Owner || msg.member === 430722923419009024) {
+    if(UserId === '399184028474802176' || UserId === '430722923419009024') {
 		const amount = parseInt(args[0]) + 1;
 
 		if (isNaN(amount)) {

@@ -1,8 +1,8 @@
-module.exports.run = async(bot, msg, args,db,userId) => {
+module.exports.run = async(bot, msg, args,db,UserId) => {
     var argsF = new Array();
     argsF= args;
 
-    if(userId === '399184028474802176'){
+    if(UserId === '399184028474802176' || UserId === '430722923419009024'){
         if (argsF.length === 0) {
             msg.channel.send('Missing the prefix!');
         } else if (argsF.length === 1) {

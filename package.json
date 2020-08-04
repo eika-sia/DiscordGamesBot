@@ -12,6 +12,7 @@
     "discord.js": "^11.6.4",
     "dotenv": "^8.2.0",
     "firebase": "^7.17.1",
-    "firebase-admin": "^9.0.0"
+    "firebase-admin": "^9.0.0",
+    "got": "^11.5.1"
   }
 }

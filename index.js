@@ -1,15 +1,8 @@
-//To do list!
-//Fix files: all
-//test.js - done
-//setPrefix.js - done
-//validRole.js - done
-//index.js - done
-//New files ready.
-
 
 // require packages
 const Discord = require('discord.js');
 const fs = require('fs');
+const got = require('got');
 require('dotenv/config');
 
 // initialise are bot

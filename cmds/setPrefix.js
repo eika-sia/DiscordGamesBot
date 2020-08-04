@@ -1,18 +1,8 @@
-module.exports.run = async(bot, msg, args,db) => {
+module.exports.run = async(bot, msg, args,db,userId) => {
     var argsF = new Array();
     argsF= args;
-    var Owner;
-    db.collection('guilds').doc(msg.guild.id).get().then((q) => {
-        if (q.exists) {
-            if(q.data().guildOwnerID === msg.author.id) {
-                Owner = q.data().guildOwnerID;
-            }
-        }
-    })
 
-    console.log(msg.member);
-
-    if(msg.member === 399184028474802176){
+    if(userId === 399184028474802176){
         if (argsF.length === 0) {
             msg.channel.send('Missing the prefix!');
         } else if (argsF.length === 1) {

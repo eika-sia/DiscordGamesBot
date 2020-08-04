@@ -1,4 +1,5 @@
 module.exports.run = async (bot, msg, args, db) => {
+    const Discord = require('discord.js');
     const HelpEmbeded4 = new Discord.MessageEmbed()
         .setColor('#3e34cf')
         .setTitle('This are commands server owners can perform!')

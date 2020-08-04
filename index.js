@@ -92,7 +92,7 @@ bot.on('message',msg => {
                         }
                     } else {
                         let allowed = false;
-                        
+                        console.log(msg.member.roles.role_id);
                         db.collection('roles').doc(msg.guild.id).get().then((r) =>{
                             for (var i = 0; i<r.data().role_id.length; i++) {
                                 msg.member.roles.role_id.forEach((uRole) => {

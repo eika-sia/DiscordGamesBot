@@ -97,8 +97,7 @@ bot.on('message',msg => {
                                 msg.member.roles.role_id.forEach((uRole) => {
                                     let tmp_role = String(uRole);
                                     tmp_role= tmp_role.substring(3, tmp_role.length-1);
-                                    //tmp_role === r.data.role_id[i]
-                                    if (true) {
+                                    if (tmp_role === r.data.role_id[i]) {
                                         let cmd = bot.commands.get(command.slice(prefix.length));
                                         if (cmd) {
                                             cmd.run(bot, msg, args, db).then(() =>{
@@ -113,7 +112,15 @@ bot.on('message',msg => {
                             }
                         }).then(() => {
                             if(!allowed) {
-                                msg.channel.send('You can\'t do that!')
+                                let cmd = bot.commands.get(command.slice(prefix.length));
+                                        if (cmd) {
+                                            cmd.run(bot, msg, args, db).then(() =>{
+                                                allowed=true;
+                                                console.log("Valid user command!");
+                                            }).catch((err) => {
+                                                console.log(err);
+                                            })
+                                        }
                             }
                         })
                     }

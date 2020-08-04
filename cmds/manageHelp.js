@@ -1,0 +1,17 @@
+module.exports.run = async (bot, msg, args, db) => {
+    const HelpEmbeded4 = new Discord.richEmbed()
+        .setColor('#3e34cf')
+        .setTitle('This are commands server owners can perform!')
+        .setAuthor('The guy writing this')
+        .addFields(
+            { name: '&prune', value: 'Bulk delete, use &prune [number]' },
+            { name: '&gradient', value: "Set the prefix, &setPrefix [new prefix, can be anything]"},
+        )
+        .setTimestamp()
+        .setFooter('Really you are searching for stuff down here again?');
+        msg.channel.send(HelpEmbeded4);
+}
+
+module.exports.help = {
+    name : "manageHelp"
+}

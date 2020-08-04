@@ -1,5 +1,5 @@
 module.exports.run = async (bot, msg, args, db) => {
-    const HelpEmbeded4 = new Discord.richEmbed()
+    const HelpEmbeded4 = new Discord.MessageEmbed()
         .setColor('#3e34cf')
         .setTitle('This are commands server owners can perform!')
         .setAuthor('The guy writing this')

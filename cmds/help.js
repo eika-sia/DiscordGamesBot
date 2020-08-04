@@ -1,6 +1,6 @@
 module.exports.run = async (bot, msg, args, db) => {
     const Discord = require('discord.js');
-        const HelpEmbeded = new Discord.richEmbed()
+        const HelpEmbeded = new Discord.MessageEmbed()
         .setColor('#49f2f5')
         .setTitle('Help Card!')
         .setAuthor('Your developer')

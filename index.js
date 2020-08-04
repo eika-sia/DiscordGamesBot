@@ -152,4 +152,4 @@ bot.on('guildCreate', async gData => {
 });
 
 // Bot login
-bot.login('NzM4NjkzODQ5MDUxODI0MTYw.XyPoQQ.Z_bxkRfpW-V73XRHHlBOwPGcT2Q');
+bot.login(process.env.token);

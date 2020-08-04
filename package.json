@@ -9,7 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "discord.js": "^11.4.2",
+    "discord.js": "^11.6.4",
     "dotenv": "^8.2.0",
     "firebase": "^7.17.1",
     "firebase-admin": "^9.0.0"

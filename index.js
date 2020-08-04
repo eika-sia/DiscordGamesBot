@@ -85,7 +85,7 @@ bot.on('message',msg => {
                     if(q.data().guildOwnerID === msg.author.id) {
                         let cmd = bot.commands.get(command.slice(prefix.length));
                         if (cmd) {
-                            let UserId = msg.member;
+                            let UserId = msg.sender;
                             cmd.run(bot, msg, args, db, UserId).then(() => {
                                 console.log('Owner used a commad!');
                             });
@@ -101,8 +101,7 @@ bot.on('message',msg => {
                                     if (tmp_role === r.data.role_id[i]) {
                                         let cmd = bot.commands.get(command.slice(prefix.length));
                                         if (cmd) {
-                                            let UserId = msg.member;
-                                            cmd.run(bot, msg, args, db, UserId).then(() =>{
+                                            cmd.run(bot, msg, args, db).then(() =>{
                                                 allowed=true;
                                                 console.log("Valid user command!");
                                             }).catch((err) => {
@@ -116,8 +115,7 @@ bot.on('message',msg => {
                             if(!allowed) {
                                 let cmd = bot.commands.get(command.slice(prefix.length));
                                         if (cmd) {
-                                            let UserId = msg.member;
-                                            cmd.run(bot, msg, args, db, UserId).then(() =>{
+                                            cmd.run(bot, msg, args, db).then(() =>{
                                                 allowed=true;
                                                 console.log("Valid user command!");
                                             }).catch((err) => {

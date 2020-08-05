@@ -1,7 +1,7 @@
 module.exports.run = async (bot, msg, args, db, UserId) => {
 	var Owner;
 
-    if(UserId === '399184028474802176' || UserId === '430722923419009024') {
+	if (UserId === '399184028474802176' || UserId === '430722923419009024') {
 		const amount = parseInt(args[0]) + 1;
 
 		if (isNaN(amount)) {
@@ -13,9 +13,10 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
 		msg.channel.bulkDelete(amount, true).catch(err => {
 			console.error(err);
 			msg.channel.send('there was an error trying to prune messages in this channel!');
-		});} else {msg.channel.send("You don't have right permissions for this!")}
+		});
+	} else { msg.channel.send("You don't have right permissions for this!") }
 }
 
 module.exports.help = {
-    name: "prune"
+	name: "prune"
 }

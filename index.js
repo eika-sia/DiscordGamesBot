@@ -28,21 +28,21 @@ let db = admin.firestore();
 
 
 //read commands files
-fs.readdir('./cmds', (err,files) => {
+fs.readdir('./cmds', (err, files) => {
     if (err) {
         console.log(err);
     }
 
     let cmdFiles = files.filter(f => f.split(".").pop() === "js");
 
-    if (cmdFiles.length === 0){
+    if (cmdFiles.length === 0) {
         console.log("No files found");
         return;
     }
 
-    cmdFiles.forEach((f,i) => {
+    cmdFiles.forEach((f, i) => {
         let props = require(`./cmds/${f}`);
-        console.log(`${i+1}: ${f} loaded`);
+        console.log(`${i + 1}: ${f} loaded`);
         bot.commands.set(props.help.name, props);
     })
 })
@@ -57,12 +57,12 @@ bot.on('ready', async () => {
 });
 
 
-bot.on('message',msg => {
-    db.collection('guilds').doc(msg.guild.id).get().then((q) =>{
-        if(q.exists){
-            prefix=q.data().prefix
+bot.on('message', msg => {
+    db.collection('guilds').doc(msg.guild.id).get().then((q) => {
+        if (q.exists) {
+            prefix = q.data().prefix
         }
-    }).then(() =>{
+    }).then(() => {
         if (msg.channel.type === "dm") return;
         if (msg.author.bot) return;
 
@@ -72,10 +72,10 @@ bot.on('message',msg => {
 
         if (!command.startsWith(prefix)) return;
 
-        if (bot.commands.get(command.slice(prefix.length))){
-            db.collection('guilds').doc(msg.guild.id).get().then((q) =>{
+        if (bot.commands.get(command.slice(prefix.length))) {
+            db.collection('guilds').doc(msg.guild.id).get().then((q) => {
                 if (q.exists) {
-                    if(q.data().guildOwnerID === msg.author.id) {
+                    if (q.data().guildOwnerID === msg.author.id) {
                         let cmd = bot.commands.get(command.slice(prefix.length));
                         if (cmd) {
                             let UserId = msg.author.id;
@@ -85,47 +85,47 @@ bot.on('message',msg => {
                         }
                     } else {
                         let allowed = false;
-                        db.collection('roles').doc(msg.guild.id).get().then((r) =>{
-                            for (var i = 0; i<r.data().role_id.length; i++) {
+                        db.collection('roles').doc(msg.guild.id).get().then((r) => {
+                            for (var i = 0; i < r.data().role_id.length; i++) {
                                 msg.member.roles.role_id.forEach((uRole) => {
                                     let tmp_role = String(uRole);
-                                    tmp_role= tmp_role.substring(3, tmp_role.length-1);
+                                    tmp_role = tmp_role.substring(3, tmp_role.length - 1);
                                     if (tmp_role === r.data.role_id[i]) {
                                         let cmd = bot.commands.get(command.slice(prefix.length));
                                         if (cmd) {
                                             let UserId = msg.author.id;
-                                            cmd.run(bot, msg, args, db, UserId).then(() =>{
-                                                allowed=true;
+                                            cmd.run(bot, msg, args, db, UserId).then(() => {
+                                                allowed = true;
                                                 console.log("Valid user command!");
                                             }).catch((err) => {
                                                 console.log(err);
                                             })
                                         }
                                     }
-                            })
+                                })
                             }
                         }).then(() => {
-                            if(!allowed) {
+                            if (!allowed) {
                                 let cmd = bot.commands.get(command.slice(prefix.length));
-                                        if (cmd) {
-                                            let UserId = msg.author.id;
-                                            cmd.run(bot, msg, args, db, UserId).then(() =>{
-                                                allowed=true;
-                                                console.log("Valid user command!");
-                                            }).catch((err) => {
-                                                console.log(err);
-                                            })
-                                        }
+                                if (cmd) {
+                                    let UserId = msg.author.id;
+                                    cmd.run(bot, msg, args, db, UserId).then(() => {
+                                        allowed = true;
+                                        console.log("Valid user command!");
+                                    }).catch((err) => {
+                                        console.log(err);
+                                    })
+                                }
                             }
                         })
                     }
                 }
             })
 
-        }  
+        }
 
     })
-    
+
 });
 
 bot.on('guildCreate', async gData => {
@@ -133,7 +133,7 @@ bot.on('guildCreate', async gData => {
         'guildID': gData.id,
         'guildName': gData.name,
         'guildOwner': gData.owner.user.username,
-        'guildOwnerID':gData.owner.id,
+        'guildOwnerID': gData.owner.id,
         'guildMemberCount': gData.memberCount,
         'prefix': '&'
     });
@@ -144,4 +144,4 @@ bot.on('guildCreate', async gData => {
 });
 
 // Bot login
-bot.login(process.env.token);
+bot.login("NzM4NjkzODQ5MDUxODI0MTYw.XyPoQQ.Ymhrk5gg7OqB_9A9KAqFYl7X0Ns");

@@ -1,11 +1,9 @@
-module.exports.run = async(bot, msg, args, db, UserId) => {
+module.exports.run = async (bot, msg, args, db, UserId) => {
     const got = require('got');
     const Discord = require('discord.js');
 
-    let Content = JSON.parse(Response.body);
+    const Embed = new Discord.RichEmbed()
 
-    const Embed = new Discord.MessageEmbed()
-    
     got('https://www.reddit.com/r/memes/random/.json').then(response => {
         let content = JSON.parse(response.body);
         let permalink = content[0].data.children[0].data.permalink;
@@ -20,10 +18,10 @@ module.exports.run = async(bot, msg, args, db, UserId) => {
         embed.setImage(memeImage)
         embed.setColor('RANDOM')
         embed.setFooter(`👍 ${memeUpvotes} 👎 ${memeDownvotes} 💬 ${memeNumComments}`)
-        message.channel.send(embed);
+        message.channel.send(Embed);
     })
 }
 
-module.help = {
-    name : 'meme'
+module.exports.help = {
+    name: 'meme'
 }

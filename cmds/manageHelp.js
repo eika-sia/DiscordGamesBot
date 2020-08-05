@@ -6,13 +6,13 @@ module.exports.run = async (bot, msg, args, db) => {
         .setAuthor('The guy writing this')
         .addFields(
             { name: '&prune', value: 'Bulk delete, use &prune [number]' },
-            { name: '&gradient', value: "Set the prefix, &setPrefix [new prefix, can be anything]"},
+            { name: '&gradient', value: "Set the prefix, &setPrefix [new prefix, can be anything]" },
         )
         .setTimestamp()
         .setFooter('Really you are searching for stuff down here again?');
-        msg.channel.send(HelpEmbeded4);
+    msg.channel.send(HelpEmbeded4);
 }
 
 module.exports.help = {
-    name : "manageHelp"
+    name: "manageHelp"
 }

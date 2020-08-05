@@ -15,11 +15,16 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             } else if (argsF.length === 1) {
                 let newPrefix = args[0];
 
-                db.collection('guilds').doc(msg.guild.id).update({
-                    'prefix': newPrefix
-                }).then(() => {
-                    msg.channel.send(`[prefix update]: new prefix ${newPrefix}`);
-                });
+                if (newPrefix.length < 3) {
+
+                    db.collection('guilds').doc(msg.guild.id).update({
+                        'prefix': newPrefix
+                    }).then(() => {
+                        msg.channel.send(`[prefix update]: new prefix ${newPrefix}`);
+                    });
+                } else {
+                    msg.channel.send('Your prefix is too long!')
+                }
             }
         } else { msg.channel.send("Do you have right permissions?"); }
     })

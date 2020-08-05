@@ -18,7 +18,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
         Embed.setImage(memeImage)
         Embed.setColor('RANDOM')
         Embed.setFooter(`👍 ${memeUpvotes} 👎 ${memeDownvotes} 💬 ${memeNumComments}`)
-        message.channel.send(Embed);
+        msg.channel.send(Embed);
     })
 }
 

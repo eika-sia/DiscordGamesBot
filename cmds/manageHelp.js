@@ -6,7 +6,7 @@ module.exports.run = async (bot, msg, args, db) => {
         .setAuthor('The guy writing this')
         .addFields(
             { name: '&prune', value: 'Bulk delete, use &prune [number]' },
-            { name: '&gradient', value: "Set the prefix, &setPrefix [new prefix, can be anything]" },
+            { name: '&setPrefix', value: "Set the prefix, &setPrefix [new prefix, can be anything]" },
             {name: '&test', value :"Doesn't really do anything except returns success if the bot is online"}
         )
         .setTimestamp()

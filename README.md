@@ -7,7 +7,7 @@ a lot of permissions but just unselect the ones you don't want, read and send me
 making changes to my code. You can probably find better bots for any functions you see here but this one is open source and I think for an example of a simple bot.
 ## It's current uses
 
-Currently it's most comlex task is creating gradients with formating for a rename command in a Minecraft server (mc-rebels.com if you want to join). It can respond with bar (a joke) and it can bulk delete messages with prune.
+Currently it's most comlex task is creating gradients with formating for a rename command in a Minecraft server (mc-rebels.com if you want to join). It can respond with bar (a joke) and it can bulk delete messages with prune. There are some more jokes like mafs now. I added firebase so you can change the prefix with setPrefix. validRole doesn't relly work right now. Only server owners (and me) can access commands listed on manageHelp. You can now even get some memes with meme command!
 
 
 Plans to make this bot are mostly unknown as I do stuff to it when I want or get a fun idea. Current project I'll be working on is blackjack singleplayer and than multiplayer. 

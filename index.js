@@ -70,8 +70,6 @@ bot.on('message', msg => {
         let command = msg_array[0];
         let args = msg_array.slice(1);
 
-        console.log(args[0]);
-
         if (!command.startsWith(prefix)) return;
 
         if (bot.commands.get(command.slice(prefix.length))) {
@@ -146,4 +144,4 @@ bot.on('guildCreate', async gData => {
 });
 
 // Bot login
-bot.login(process.env.token);
+bot.login("NzM4NjkzODQ5MDUxODI0MTYw.XyPoQQ.cvOSARj51IG-vKLGjxHdGA6QcPU");

@@ -7,6 +7,7 @@ module.exports.run = async (bot, msg, args, db) => {
         .addFields(
             { name: '&prune', value: 'Bulk delete, use &prune [number]' },
             { name: '&gradient', value: "Set the prefix, &setPrefix [new prefix, can be anything]" },
+            {name: '&test', "Doesn't really do anything except returns success if the bot is online"}
         )
         .setTimestamp()
         .setFooter('Really you are searching for stuff down here again?');

@@ -7,14 +7,11 @@ module.exports.run = async (bot, msg, args, db) => {
         .setDescription('How to use this simple bot!')
         .setTimestamp()
         .setFooter('What are you searching for down here?')
-        var AddFieldObject=[
+        .addField(
             { name: '&help', value: 'Opens this nicely made card' },
             { name: '&gradient', value: "Returns a command for a gradient with hex codes, it is useful for gradients with formating because the rgb ones don't work. Usage is: &gradient [hex code 1] [word] [hex code 2] [bold/undeline/italic]. last  input is for formating! *leave empty if you don't want formating!" },
             { name: "&misc", value: 'Send a card explaining misc commands!' }
-        ]
-        AddFieldObject.forEach(({name, value, isInLine}) => {
-            HelpEmbeded.addField(name, value, isInLine);
-        });
+        )
     msg.channel.send(HelpEmbeded);
 }
 

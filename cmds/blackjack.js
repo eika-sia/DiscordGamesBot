@@ -6,7 +6,7 @@ module.exports.run = async (bot, msg, args, db) => {
     argsF = args;
 
     if (argsF.length === 0) {
-        const HelpEmbeded3 = new Discord.richEmbed()
+        const HelpEmbeded3 = new Discord.MessageEmbed()
             .setColor('#e01010')
             .setTitle("It's time to play blackjack!")
             .setAuthor("tbh I don't know who")

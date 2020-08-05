@@ -1,7 +1,7 @@
 module.exports.run = async (bot, msg, args, db, UserId) => {
     const ms = require('ms');
     
-    if(msg.member.hasPermission('MANAGE_msgS')) {
+    if(msg.member.hasPermission('MANAGE_MESSAGES')) {
         var member = msg.guild.member(msg.mentions.users.first() || msg.guild.members.cache.get(args[0]));
         if(!member) return msg.reply('Please Provide a Member to TempMute.')
 

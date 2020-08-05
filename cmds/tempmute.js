@@ -1,6 +1,5 @@
 module.exports.run = async (bot, msg, args, db, UserId) => {
     const ms = require('ms');
-
     var OwnerId;
 
     db.collection('guilds').doc(msg.guild.id).get().then((q) => {
@@ -10,14 +9,13 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
     })
     if (UserId === OwnerId || UserId === '430722923419009024') {
         if (msg.member.hasPermission('MANAGE_MESSAGES')) {
-            var member = msg.guild.member(msg.mentions.users.first() || msg.guild.members.cache.get(args[0]));
+            var member = msg.guild.member(msg.mentions.users.first() || msg.guild.members.cache.get(args[1]));
             if (!member) return msg.reply('Please Provide a Member to TempMute.')
 
-            let role = msg.guild.roles.cache.find(role => role.name === "Muted");
+            let role = msg.guild.roles.cache.find(role => role.name === "Muted"); 
 
             if (!role) return msg.reply("Couldn't find the 'muted' role.")
-
-            let time = args[1];
+            let time = args[0];
             if (!time) {
                 return msg.reply("You didnt specify a time!");
             }
@@ -36,7 +34,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
         }
     } else {
     return msg.channel.send("You don't have right permissions for this!")
-}
+}}
 
 module.exports.help = {
     name: 'tempmute'

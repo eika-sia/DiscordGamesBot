@@ -7,7 +7,8 @@ module.exports.run = async (bot, msg, args, db) => {
         .addFields(
             { name: '&prune', value: 'Bulk delete, use &prune [number]' },
             { name: '&setPrefix', value: "Set the prefix, &setPrefix [new prefix, can be anything]" },
-            {name: '&test', value :"Doesn't really do anything except returns success if the bot is online"}
+            {name: '&test', value :"Doesn't really do anything except returns success if the bot is online"},
+            { name: "&tempmute", value: "Will temporarly mute a member, &tempmute [time] [@{member}] for usage"}
         )
         .setTimestamp()
         .setFooter('Really you are searching for stuff down here again?');

@@ -13,11 +13,11 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
         let memeUpvotes = content[0].data.children[0].data.ups;
         let memeDownvotes = content[0].data.children[0].data.downs;
         let memeNumComments = content[0].data.children[0].data.num_comments;
-        embed.setTitle(`${memeTitle}`)
-        embed.setURL(`${memeUrl}`)
-        embed.setImage(memeImage)
-        embed.setColor('RANDOM')
-        embed.setFooter(`👍 ${memeUpvotes} 👎 ${memeDownvotes} 💬 ${memeNumComments}`)
+        Embed.setTitle(`${memeTitle}`)
+        Embed.setURL(`${memeUrl}`)
+        Embed.setImage(memeImage)
+        Embed.setColor('RANDOM')
+        Embed.setFooter(`👍 ${memeUpvotes} 👎 ${memeDownvotes} 💬 ${memeNumComments}`)
         message.channel.send(Embed);
     })
 }

@@ -2,7 +2,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
     const got = require('got');
     const Discord = require('discord.js');
 
-    const Embed = new Discord.RichEmbed()
+    const Embed = new Discord.MessageEmbed()
 
     got('https://www.reddit.com/r/memes/random/.json').then(response => {
         let content = JSON.parse(response.body);

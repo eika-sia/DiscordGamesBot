@@ -19,7 +19,6 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
         msg.channel.send(`@${member.user.tag} has now been muted for ${ms(ms(time))}`)
 
         setTimeout( function () {
-            member.roles.add(mainrole.id)
             member.roles.remove(role.id);
             msg.channel.send(`@${member.user.tag} has been unmuted.`)
         }, ms(time));

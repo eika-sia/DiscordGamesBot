@@ -1,3 +1,5 @@
+const { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } = require('constants');
+
 module.exports.run = async (bot, msg, args, db) => {
     const Discord = require('discord.js');
     let FieldValue = require('firebase-admin').firestore.FieldValue;
@@ -27,7 +29,7 @@ module.exports.run = async (bot, msg, args, db) => {
             .addFields(
                 { name: '&blackjack hit', value: 'Get another card!' },
                 { name: '&blackjack stand', value: "Stop getting cards for the round!" },
-                { name: "&blackjack start", value: 'Start the game' },
+                { name: "&blackjack start [bet]", value: 'Start the game' },
             )
             .setTimestamp()
             .setFooter('What are you searching for down here?');
@@ -54,65 +56,73 @@ module.exports.run = async (bot, msg, args, db) => {
                     credits.push(200);
                     PlayerNames.push(msg.author.username);
                 }
-                credits[players.indexOf(msg.author.id)] -= 50;
-                draw1 = Math.floor(Math.random() * 13);
-                draw2 = Math.floor(Math.random() * 13);
-                if (draw1 > 10) { }
-                console.log("New Game by " + msg.author.id);
-                console.log(draw1);
-                console.log(draw2);
-                game = true;
-                total = 0;
-                msg.channel.send("--Commands--");
-                msg.channel.send("?hit - draws new card to add to total");
-                msg.channel.send("?stay - keeps current cards for final amount");
-                //loading stuff ya know
-                if (draw1 > 9 && draw2 > 9) {
-                    if (draw2 = 10) {
-                        total = 1 + draw1 + draw2;
-                    } else if (draw = 11) {
-                        total = draw1 + draw2;
-                    } else {
-                        total = draw1 + draw2 - 1;
-                    }
-                    if (draw2 = 10) {
-                        total += 1;
-                    } else {
-                        total -= 1;
-                    }
-                    msg.channel.send("You pulled a " + royals[(draw2) - 10] + " and a " + royals[(draw1) - 10] + " for a total of 20");
+                if (argsF.length != 2) {
+                    if (credits[players.indexOf(msg.author.id)] > parseInt(args[1])) {
+                        credits[players.indexOf(msg.author.id)] = credits[players.indexOf(msg.author.id)] - parseInt(args[1]) ;
+                        draw1 = Math.floor(Math.random() * 13);
+                        draw2 = Math.floor(Math.random() * 13);
+                        if (draw1 > 10) { }
+                        console.log("New Game by " + msg.author.id);
+                        console.log(draw1);
+                        console.log(draw2);
+                        game = true;
+                        total = 0;
+                        msg.channel.send("--Commands--");
+                        msg.channel.send("?hit - draws new card to add to total");
+                        msg.channel.send("?stay - keeps current cards for final amount");
+                        //loading stuff ya know
+                        if (draw1 > 9 && draw2 > 9) {
+                            if (draw2 = 10) {
+                                total = 1 + draw1 + draw2;
+                            } else if (draw = 11) {
+                                total = draw1 + draw2;
+                            } else {
+                                total = draw1 + draw2 - 1;
+                            }
+                            if (draw2 = 10) {
+                                total += 1;
+                            } else {
+                                total -= 1;
+                            }
+                            msg.channel.send("You pulled a " + royals[(draw2) - 10] + " and a " + royals[(draw1) - 10] + " for a total of 20");
 
-                } else if (draw1 > 9) {
-                    if (draw1 = 10) {
-                        total = 1 + draw1 + draw2;
-                    } else if (draw1 = 11) {
-                        total = draw1 + draw2;
-                    } else {
-                        total = draw1 + draw2 - 1
-                    }
-                    msg.channel.send("You pulled a " + cardNums[draw2] + " and a " + royals[(draw1) - 10] + " for a total of " + total);
+                        } else if (draw1 > 9) {
+                            if (draw1 = 10) {
+                                total = 1 + draw1 + draw2;
+                            } else if (draw1 = 11) {
+                                total = draw1 + draw2;
+                            } else {
+                                total = draw1 + draw2 - 1
+                            }
+                            msg.channel.send("You pulled a " + cardNums[draw2] + " and a " + royals[(draw1) - 10] + " for a total of " + total);
 
-                } else if (draw2 > 9) {
-                    if (draw2 = 10) {
-                        total = 1 + draw1 + draw2;
-                    } else if (draw2 = 11) {
-                        total = draw1 + draw2;
-                    } else {
-                        total = draw1 + draw2 - 1
-                    }
-                    msg.channel.send("You pulled a " + royals[(draw2) - 10] + " and a " + cardNums[draw1] + " for a total of " + total);
+                        } else if (draw2 > 9) {
+                            if (draw2 = 10) {
+                                total = 1 + draw1 + draw2;
+                            } else if (draw2 = 11) {
+                                total = draw1 + draw2;
+                            } else {
+                                total = draw1 + draw2 - 1
+                            }
+                            msg.channel.send("You pulled a " + royals[(draw2) - 10] + " and a " + cardNums[draw1] + " for a total of " + total);
 
+                        } else {
+                            total = 2 + draw1 + draw2;
+                            msg.channel.send("You pulled a " + cardNums[draw2] + " and a " + cardNums[draw1] + " for a total of " + total);
+                        }
+                        db.collection('blackjack').doc(msg.guild.id).update({
+                            'credits': credits,
+                            'players': players,
+                            'game': game,
+                            'total': total,
+                            'playersName': PlayerNames,
+                        });
+                    }
                 } else {
-                    total = 2 + draw1 + draw2;
-                    msg.channel.send("You pulled a " + cardNums[draw2] + " and a " + cardNums[draw1] + " for a total of " + total);
+                    msg.channel.send("you don't have enough money to play with this bet. *if on 0 msg me (GameMasterCRO, Goran#0372) to give you 50 credits, only on a daily basis!")
                 }
-                db.collection('blackjack').doc(msg.guild.id).update({
-                    'credits': credits,
-                    'players': players,
-                    'game': game,
-                    'total': total,
-                    'playersName' : PlayerNames
-                });
+            } else {
+                msg.channel.send("Please use the command {prefix}blackjack start [bet]")
             }
         });
 
@@ -142,7 +152,7 @@ module.exports.run = async (bot, msg, args, db) => {
                     game = false;
                     db.collection('blackjack').doc(msg.guild.id).update({
                         game: false,
-                        total : 0
+                        total: 0
                     });
                     msg.channel.send("You now have " + credits[players.indexOf(msg.author.id)] + " credits");
 
@@ -173,12 +183,12 @@ module.exports.run = async (bot, msg, args, db) => {
                     msg.channel.send("You Lose");
                 } else {
                     msg.channel.send("You Win!");
-                    credits[players.indexOf(msg.author.id)] += 100;
+                    credits[players.indexOf(msg.author.id)] = credits[players.indexOf(msg.author.id)] + parseInt(args[1])*2;
                 }
                 game = false;
                 db.collection('blackjack').doc(msg.guild.id).update({
                     game: false,
-                    total : 0
+                    total: 0
                 })
                 msg.channel.send("You now have " + credits[players.indexOf(msg.author.id)] + " credits");
                 db.collection('blackjack').doc(msg.guild.id).update({

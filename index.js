@@ -19,6 +19,7 @@ const Firebase = require('firebase/app');
 const FieldValue = require('firebase-admin/').firestore.FieldValue;
 const admin = require('firebase-admin');
 const serviceAccount = require('./ServiceAccount.json');
+const { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } = require('constants');
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
@@ -148,7 +149,9 @@ bot.on('guildCreate', async gData => {
         credits: [],
         players: [],
         game: false,
-        playersName: []
+        playersName: [],
+        bet : 0,
+        total: 0
     })
 });
 

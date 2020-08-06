@@ -12,10 +12,10 @@ module.exports.run = async (bot, msg, args, db) => {
             .setTitle('This are commands server owners can perform!')
             .setAuthor('The guy writing this')
             .addFields(
-                { name: `${preifx}prune [n of msgs]`, value: 'Bulk delete' },
-                { name: `${preifx}setPrefix [new prefix, can be anything]`, value: "Set the prefix" },
-                { name: `${preifx}test`, value: "Doesn't really do anything except returns success if the bot is online" },
-                { name: `${preifx}tempmute [time] [@{member}]`, value: "Will temporarly mute a member" }
+                { name: `${prefix}prune [n of msgs]`, value: 'Bulk delete' },
+                { name: `${prefix}setPrefix [new prefix, can be anything]`, value: "Set the prefix" },
+                { name: `${prefix}test`, value: "Doesn't really do anything except returns success if the bot is online" },
+                { name: `${prefix}tempmute [time] [@{member}]`, value: "Will temporarly mute a member" }
             )
             .setTimestamp()
             .setFooter('Really you are searching for stuff down here again?');

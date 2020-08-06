@@ -85,7 +85,7 @@ module.exports.run = async (bot, msg, args, db) => {
 
                             msg.channel.send(BjCommands)
                             //loading stuff ya know
-                            let CardPull1 = new Discord.MessageEmbed().setColor("RANDOM")
+                            let CardPull1 = new Discord.MessageEmbed().setColor("#52eb34")
                             if (draw1 > 9 && draw2 > 9) {
                                 if (draw2 = 10) {
                                     total = 1 + draw1 + draw2;
@@ -99,8 +99,8 @@ module.exports.run = async (bot, msg, args, db) => {
                                 } else {
                                     total -= 1;
                                 }
-                                CardPull1.addField({name: "You pulled a", value: royals[(draw2) - 10] + " and a " + royals[(draw1) - 10] + " for a total of 20"})
-                                msg.channel.send(CardPull1);
+                                var CardValue = String(royals[(draw2) - 10]) + " and a " + String(royals[(draw1) - 10]) + " for a total of 20"
+                                CardPull1.addField({name: "You pulled a", value: CardValue})
 
                             } else if (draw1 > 9) {
                                 if (draw1 = 10) {
@@ -111,7 +111,6 @@ module.exports.run = async (bot, msg, args, db) => {
                                     total = draw1 + draw2 - 1
                                 }
                                 CardPull1.addField({name: "You pulled a", value: cardNums[draw2] + " and a " + royals[(draw1) - 10] + " for a total of " + total})
-                                msg.channel.send(CardPull1);
 
                             } else if (draw2 > 9) {
                                 if (draw2 = 10) {
@@ -122,13 +121,12 @@ module.exports.run = async (bot, msg, args, db) => {
                                     total = draw1 + draw2 - 1
                                 }
                                 CardPull1.addField({name: "You pulled a", value: royals[(draw2) - 10] + " and a " + cardNums[draw1] + " for a total of " + total})
-                                msg.channel.send(CardPull1);
 
                             } else {
                                 total = 2 + draw1 + draw2;
                                 CardPull1.addField({name: "You pulled a", value: cardNums[draw2] + " and a " + cardNums[draw1] + " for a total of " + total})
-                                msg.channel.send(CardPull1);
                             }
+                            msg.channel.send(CardPull1)
                             db.collection('blackjack').doc(msg.guild.id).update({
                                 'credits': credits,
                                 'players': players,
@@ -155,7 +153,7 @@ module.exports.run = async (bot, msg, args, db) => {
                     total = q.data().total;
                 }
             }).then(() => {
-                let CardPull2 = new Discord.MessageEmbed().setColor("RANDOM");
+                let CardPull2 = new Discord.MessageEmbed().setColor("#e8d938");
                 if (args[0] == "hit" && game == true) {
                     card3 = Math.floor(Math.random() * 13);
                     if (card3 >= 10) {
@@ -169,7 +167,7 @@ module.exports.run = async (bot, msg, args, db) => {
                         CardPull2.addField({name: "You pulled a", value: cardNums[card3] + " and had a total of " + total})
                         msg.channel.send(CardPull2);
                     }
-                    let Busted = new Discord.MessageEmbed().setColor("RANDOM")
+                    let Busted = new Discord.MessageEmbed().setColor("#a528ed")
                     msg.channel.send("Your new Total is " + total);
                     if (total > 21) {
                         Busted.setTitle("Bust!");
@@ -205,7 +203,7 @@ module.exports.run = async (bot, msg, args, db) => {
                 WinMoney = WinMoney * 2 + credits[players.indexOf(msg.author.id)];
                 //parseInt(credits[players.indexOf(msg.author.id)]) +
                 if (args[0] == "stay" && game == true) {
-                    let WinLooseF = new Discord.MessageEmbed().setColor("RANDOM")
+                    let WinLooseF = new Discord.MessageEmbed().setColor("#e37b27")
                     var dealerTotal = Math.floor(Math.random() * 6) + 17;
                     WinLooseF.addField(
                         {name:"You stood at a final total of ", value: total},

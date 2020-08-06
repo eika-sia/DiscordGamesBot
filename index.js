@@ -58,6 +58,9 @@ bot.on('ready', async () => {
 
 
 bot.on('message', msg => {
+    db.collection('guilds').doc(msg.guild.id).update({
+        'guildMemberCount': msg.guild.memberCount
+    });
     db.collection('guilds').doc(msg.guild.id).get().then((q) => {
         if (q.exists) {
             prefix = q.data().prefix

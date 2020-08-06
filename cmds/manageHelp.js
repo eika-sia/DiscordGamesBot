@@ -1,6 +1,7 @@
 module.exports.run = async (bot, msg, args, db) => {
     const Discord = require('discord.js');
-
+    
+    let prefix;
     db.collection('guilds').doc(msg.guild.id).get().then((q) => {
         if (q.exists) {
             prefix = q.data().prefix;

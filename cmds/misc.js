@@ -12,11 +12,11 @@ module.exports.run = async (bot, msg, args, db) => {
             .setAuthor('Totally not your developer')
             .setDescription('What fun things to do!')
             .addFields(
-                { name: '&misc', value: 'Opens this 2nd nicely made card' },
-                { name: '&bar', value: "Bar!" },
-                { name: "&mafs", value: 'Tru equation!' },
-                { name: "blackjack", value: "Game of Blackjack! &blackjack Create [number of players (1-3)] to start the game" },
-                { name: "&meme", value: "Generates a meme from reddit!" }
+                { name: '${prefix}misc', value: 'Opens this 2nd nicely made card' },
+                { name: '${prefix}bar', value: "Bar!" },
+                { name: "${prefix}mafs", value: 'Tru equation!' },
+                { name: "${prefix}blackjack", value: "Game of Blackjack!" },
+                { name: "${prefix}meme", value: "Generates a meme from reddit!" }
             )
             .setTimestamp()
             .setFooter('What are you searching for down here?');

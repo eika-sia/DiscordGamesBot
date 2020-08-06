@@ -18,7 +18,7 @@ module.exports.run = async (bot, msg, args, db) => {
             .setFooter('What are you searching for down here?')
             .addFields(
                 { name: `${prefix}help`, value: 'Opens this nicely made card' },
-                { name: `${prefix}gradient`, value: "Returns a command for a gradient with hex codes, it is useful for gradients with formating because the rgb ones don't work. Usage is: &gradient [hex code 1] [word] [hex code 2] [bold/undeline/italic]. last  input is for formating! *leave empty if you don't want formating!" },
+                { name: `${prefix}gradient [hex code 1] [word] [hex code 2] [bold/undeline/italic]`, value: "Returns a command for a gradient with hex codes, it is useful for gradients with formating because the rgb ones don't work. *leave empty if you don't want formating!" },
                 { name: `${prefix}misc`, value: 'Send a card explaining misc commands!' },
                 { name: `${prefix}manageHelp`, value: "Open a card with commands for owners!" }
             )

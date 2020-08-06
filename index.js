@@ -144,6 +144,11 @@ bot.on('guildCreate', async gData => {
     db.collection('roles').doc(gData.id).set({
         role_id: []
     })
+    db.collection('blackjack').doc(gData).set({
+        credits: [],
+        players: [],
+        game: false
+    })
 });
 
 // Bot login

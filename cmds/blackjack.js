@@ -1,4 +1,4 @@
-const { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } = require('constants');
+
 
 module.exports.run = async (bot, msg, args, db) => {
     const Discord = require('discord.js');
@@ -56,9 +56,9 @@ module.exports.run = async (bot, msg, args, db) => {
                     credits.push(200);
                     PlayerNames.push(msg.author.username);
                 }
-                if (argsF.length != 2) {
-                    if (credits[players.indexOf(msg.author.id)] > parseInt(args[1])) {
-                        credits[players.indexOf(msg.author.id)] = credits[players.indexOf(msg.author.id)] - parseInt(args[1]) ;
+                if (argsF.length == 2) {
+                    if (credits[players.indexOf(msg.author.id)] >= parseInt(args[1])) {
+                        credits[players.indexOf(msg.author.id)] = credits[players.indexOf(msg.author.id)] - parseInt(args[1]);
                         draw1 = Math.floor(Math.random() * 13);
                         draw2 = Math.floor(Math.random() * 13);
                         if (draw1 > 10) { }
@@ -116,13 +116,14 @@ module.exports.run = async (bot, msg, args, db) => {
                             'game': game,
                             'total': total,
                             'playersName': PlayerNames,
+                            'bet': args[1]
                         });
+                    } else {
+                        msg.channel.send("you don't have enough money to play with this bet. *if on 0 msg me (GameMasterCRO, Goran#0372) to give you 50 credits, only on a daily basis!")
                     }
                 } else {
-                    msg.channel.send("you don't have enough money to play with this bet. *if on 0 msg me (GameMasterCRO, Goran#0372) to give you 50 credits, only on a daily basis!")
+                    msg.channel.send("Please use the command {prefix}blackjack start [bet]");
                 }
-            } else {
-                msg.channel.send("Please use the command {prefix}blackjack start [bet]")
             }
         });
 
@@ -167,14 +168,18 @@ module.exports.run = async (bot, msg, args, db) => {
         });
 
         //"staying" homE during the pandemic!
+        let WinMoney
         db.collection('blackjack').doc(msg.guild.id).get().then((q) => {
             if (q.exists) {
                 credits = q.data().credits;
                 players = q.data().players;
                 game = q.data().game;
                 total = q.data().total;
+                WinMoney = q.data().bet;
             }
         }).then(() => {
+            WinMoney = WinMoney*2+ credits[players.indexOf(msg.author.id)];
+            //parseInt(credits[players.indexOf(msg.author.id)]) +
             if (args[0] == "stay" && game == true) {
                 var dealerTotal = Math.floor(Math.random() * 6) + 17;
                 msg.channel.send("You stood at a final total of " + total);
@@ -183,7 +188,7 @@ module.exports.run = async (bot, msg, args, db) => {
                     msg.channel.send("You Lose");
                 } else {
                     msg.channel.send("You Win!");
-                    credits[players.indexOf(msg.author.id)] = credits[players.indexOf(msg.author.id)] + parseInt(args[1])*2;
+                    credits[players.indexOf(msg.author.id)] = WinMoney;
                 }
                 game = false;
                 db.collection('blackjack').doc(msg.guild.id).update({

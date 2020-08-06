@@ -151,9 +151,10 @@ bot.on('guildCreate', async gData => {
         game: false,
         playersName: [],
         bet : 0,
-        total: 0
+        total: 0,
+        bet : 0
     })
 });
 
 // Bot login
-bot.login(process.env.token);
+bot.login("NzM4NjkzODQ5MDUxODI0MTYw.XyPoQQ.FYX_-huFvHyCxcHJsF1LDhcgepY");

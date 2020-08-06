@@ -34,12 +34,14 @@ module.exports.run = async (bot, msg, args, db) => {
         msg.channel.send(HelpEmbeded3);
     } else {
         //Game
+        var PlayerNames = new Array();
         db.collection('blackjack').doc(msg.guild.id).get().then((q) => {
             if (q.exists) {
                 credits = q.data().credits;
                 players = q.data().players;
                 game = q.data().game;
                 total = q.data().total;
+                PlayerNames = q.data().playersName;
             }
         }).then(() => {
 
@@ -50,6 +52,7 @@ module.exports.run = async (bot, msg, args, db) => {
                     //Add 
                     players.push(msg.author.id);
                     credits.push(200);
+                    PlayerNames.push(msg.author.username);
                 }
                 credits[players.indexOf(msg.author.id)] -= 50;
                 draw1 = Math.floor(Math.random() * 13);
@@ -107,7 +110,8 @@ module.exports.run = async (bot, msg, args, db) => {
                     'credits': credits,
                     'players': players,
                     'game': game,
-                    'total': total
+                    'total': total,
+                    'playersName' : PlayerNames
                 });
             }
         });

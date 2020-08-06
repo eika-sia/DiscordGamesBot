@@ -147,7 +147,8 @@ bot.on('guildCreate', async gData => {
     db.collection('blackjack').doc(gData).set({
         credits: [],
         players: [],
-        game: false
+        game: false,
+        playersName: []
     })
 });
 

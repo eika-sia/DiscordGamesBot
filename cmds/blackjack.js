@@ -36,7 +36,7 @@ module.exports.run = async (bot, msg, args, db) => {
                 .setDescription('What will happen now!')
                 .addFields(
                     { name: `${Prefix}blackjack hit`, value: 'Get another card!' },
-                    { name: `${Prefix}blackjack stand`, value: "Stop getting cards for the round!" },
+                    { name: `${Prefix}blackjack stay`, value: "Stop getting cards for the round!" },
                     { name: `${Prefix}blackjack start [bet]`, value: 'Start the game' },
                 )
                 .setTimestamp()
@@ -80,7 +80,7 @@ module.exports.run = async (bot, msg, args, db) => {
                             .setTitle("-=Commands=-")
                             .addFields(
                                 {name: `${Prefix}blackjack hit`, value: "Get 1 more card"},
-                                {name: `${Prefix}blackjack stand`, value: "Stop getting cards, will finish the match"}
+                                {name: `${Prefix}blackjack stay`, value: "Stop getting cards, will finish the match"}
                             )
 
                             msg.channel.send(BjCommands)

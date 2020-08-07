@@ -171,8 +171,8 @@ module.exports.run = async (bot, msg, args, db) => {
                         Busted.setTitle("Bust!");
                         game = false;
                         db.collection('blackjack').doc(msg.guild.id).update({
-                            game: false,
-                            total: 0
+                            'game': false,
+                            'total': 0
                         });
                         Busted.addFields({name:"You now have ", value:`${credits[players.indexOf(msg.author.id)]} credits`})
                         msg.channel.send(Busted);
@@ -215,8 +215,8 @@ module.exports.run = async (bot, msg, args, db) => {
                     }
                     game = false;
                     db.collection('blackjack').doc(msg.guild.id).update({
-                        game: false,
-                        total: 0
+                        'game': false,
+                        'total': 0
                     })
                     WinLooseF.addFields({name: "You now have ", value: `${credits[players.indexOf(msg.author.id)]} credits`})
                     msg.channel.send(WinLooseF)

@@ -295,8 +295,43 @@ module.exports.run = async (bot, msg, args, db) => {
                 }
             })
         }
-        db.collection
-    })
+        db.collection('blackjack').doc(msg.guild.id).get().then((q) => {
+            if (q.exists) {
+                credits = q.data().credits;
+                players = q.data().playersName;
+            }
+        }).then(() => {
+            if (args[0] === 'top') {
+                let len = credits.length;
+                for (let i = 0; i < len; i++) {
+                    for (let j = 0; j < len; j++) {
+                        if (credits[j] < credits[j + 1]) {
+                            let tmp = credits[j];
+                            let tmp2 = players[j];
+                            credits[j] = credits[j + 1];
+                            players[j] = players [j + 1];
+                            credits[j + 1] = tmp;
+                            players[j + 1] = tmp2;
+                        }
+                    }
+                }
+                const BjTop = new Discord.MessageEmbed()
+                    .setTitle("Top blackjack players:")
+                    .setColor("RANDOM")
+                    .addFields({
+                        name: `1. ${players[0]}`,
+                        value: `Balance: ${credits[0]}`
+                    }, {
+                        name: `2. ${players[1]}`,
+                        value: `Balance: ${credits[1]}`
+                    }, {
+                        name: `3. ${players[2]}`,
+                        value: `Balance: ${credits[2]}`
+                    });
+                msg.channel.send(BjTop);
+            }
+        });
+    });
 }
 
 module.exports.help = {

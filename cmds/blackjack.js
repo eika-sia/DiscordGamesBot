@@ -1,5 +1,3 @@
-
-
 module.exports.run = async (bot, msg, args, db) => {
     const Discord = require('discord.js');
     let FieldValue = require('firebase-admin').firestore.FieldValue;
@@ -34,11 +32,16 @@ module.exports.run = async (bot, msg, args, db) => {
                 .setTitle("It's time to play blackjack!")
                 .setAuthor("tbh I don't know who")
                 .setDescription('What will happen now!')
-                .addFields(
-                    { name: `${Prefix}blackjack hit`, value: 'Get another card!' },
-                    { name: `${Prefix}blackjack stay`, value: "Stop getting cards for the round!" },
-                    { name: `${Prefix}blackjack start [bet]`, value: 'Start the game' },
-                )
+                .addFields({
+                    name: `${Prefix}blackjack hit`,
+                    value: 'Get another card!'
+                }, {
+                    name: `${Prefix}blackjack stay`,
+                    value: "Stop getting cards for the round!"
+                }, {
+                    name: `${Prefix}blackjack start [bet]`,
+                    value: 'Start the game'
+                }, )
                 .setTimestamp()
                 .setFooter('What are you searching for down here?');
             msg.channel.send(HelpEmbeded3);
@@ -69,7 +72,7 @@ module.exports.run = async (bot, msg, args, db) => {
                             credits[players.indexOf(msg.author.id)] = credits[players.indexOf(msg.author.id)] - parseInt(args[1]);
                             draw1 = Math.floor(Math.random() * 13);
                             draw2 = Math.floor(Math.random() * 13);
-                            if (draw1 > 10) { }
+                            if (draw1 > 10) {}
                             console.log("New Game by " + msg.author.id);
                             console.log(draw1);
                             console.log(draw2);
@@ -77,11 +80,14 @@ module.exports.run = async (bot, msg, args, db) => {
                             total = 0;
 
                             const BjCommands = new Discord.MessageEmbed().setColor("RANDOM")
-                            .setTitle("-=Commands=-")
-                            .addFields(
-                                {name: `${Prefix}blackjack hit`, value: "Get 1 more card"},
-                                {name: `${Prefix}blackjack stay`, value: "Stop getting cards, will finish the match"}
-                            )
+                                .setTitle("-=Commands=-")
+                                .addFields({
+                                    name: `${Prefix}blackjack hit`,
+                                    value: "Get 1 more card"
+                                }, {
+                                    name: `${Prefix}blackjack stay`,
+                                    value: "Stop getting cards, will finish the match"
+                                })
 
                             msg.channel.send(BjCommands)
                             //loading stuff ya know
@@ -99,7 +105,10 @@ module.exports.run = async (bot, msg, args, db) => {
                                 } else {
                                     total -= 1;
                                 }
-                                CardPull1.addFields({name: "You pulled a", value: `${royals[(draw2)-10]} and a ${royals[(draw1) - 10]} for a ${total} of 20`})
+                                CardPull1.addFields({
+                                    name: "You pulled a",
+                                    value: `${royals[(draw2)-10]} and a ${royals[(draw1) - 10]} for a ${total} of 20`
+                                })
 
                             } else if (draw1 > 9) {
                                 if (draw1 = 10) {
@@ -109,7 +118,10 @@ module.exports.run = async (bot, msg, args, db) => {
                                 } else {
                                     total = draw1 + draw2 - 1
                                 }
-                                CardPull1.addFields({name: "You pulled a", value: `${cardNums[draw2]} and a ${royals[(draw1) - 10]} for a total of ${total}`})
+                                CardPull1.addFields({
+                                    name: "You pulled a",
+                                    value: `${cardNums[draw2]} and a ${royals[(draw1) - 10]} for a total of ${total}`
+                                })
 
                             } else if (draw2 > 9) {
                                 if (draw2 = 10) {
@@ -119,11 +131,17 @@ module.exports.run = async (bot, msg, args, db) => {
                                 } else {
                                     total = draw1 + draw2 - 1
                                 }
-                                CardPull1.addFields({name: "You pulled a", value: `${royals[(draw2) - 10]} and a ${cardNums[draw1]} for a total of ${total}`})
+                                CardPull1.addFields({
+                                    name: "You pulled a",
+                                    value: `${royals[(draw2) - 10]} and a ${cardNums[draw1]} for a total of ${total}`
+                                })
 
                             } else {
                                 total = 2 + draw1 + draw2;
-                                CardPull1.addFields({name: "You pulled a", value: `${cardNums[draw2]} and a ${cardNums[draw1]} for a total of ${total}`})
+                                CardPull1.addFields({
+                                    name: "You pulled a",
+                                    value: `${cardNums[draw2]} and a ${cardNums[draw1]} for a total of ${total}`
+                                })
                             }
                             msg.channel.send(CardPull1)
                             db.collection('blackjack').doc(msg.guild.id).update({
@@ -159,10 +177,16 @@ module.exports.run = async (bot, msg, args, db) => {
                         card3 = 10;
                         c3f[Math.floor(Math.random() * 3)];
                         total += card3;
-                        CardPull2.addFields({name: "You pulled a", value: `${c3f[Math.floor(Math.random() * 3)]} and had ${total}`})
+                        CardPull2.addFields({
+                            name: "You pulled a",
+                            value: `${c3f[Math.floor(Math.random() * 3)]} and had ${total}`
+                        })
                     } else {
                         total = total + 1 + card3;
-                        CardPull2.addFields({name: "You pulled a", value: `${cardNums[card3]} and had a total of ${total}`})
+                        CardPull2.addFields({
+                            name: "You pulled a",
+                            value: `${cardNums[card3]} and had a total of ${total}`
+                        })
                     }
                     msg.channel.send(CardPull2);
                     let Busted = new Discord.MessageEmbed().setColor("#a528ed")
@@ -174,8 +198,15 @@ module.exports.run = async (bot, msg, args, db) => {
                             'game': false,
                             'total': 0
                         });
-                        Busted.addFields({name:"You now have ", value:`${credits[players.indexOf(msg.author.id)]} credits`})
+                        Busted.addFields({
+                            name: "You now have ",
+                            value: `${credits[players.indexOf(msg.author.id)]} credits`
+                        })
                         msg.channel.send(Busted);
+                        if (credits[players.indexOf(msg.author.id)] === 0) {
+                            msg.channel.send("Hmm looks like you are broke, here have 50 credits so you can earn up more!");
+                            credits[players.indexOf(msg.author.id)] = credits[players.indexOf(msg.author.id)] + 50;
+                        }
 
                     }
                     db.collection('blackjack').doc(msg.guild.id).update({
@@ -203,10 +234,13 @@ module.exports.run = async (bot, msg, args, db) => {
                 if (args[0] == "stay" && game == true) {
                     let WinLooseF = new Discord.MessageEmbed().setColor("#e37b27")
                     var dealerTotal = Math.floor(Math.random() * 6) + 17;
-                    WinLooseF.addFields(
-                        {name:"You stood at a final total of ", value: `${total}`},
-                        {name: "The dealer stood with a total of ", value: `${dealerTotal}`}
-                    );
+                    WinLooseF.addFields({
+                        name: "You stood at a final total of ",
+                        value: `${total}`
+                    }, {
+                        name: "The dealer stood with a total of ",
+                        value: `${dealerTotal}`
+                    });
                     if (total <= dealerTotal && dealerTotal <= 21) {
                         WinLooseF.setTitle("You Lose!");
                     } else {
@@ -218,7 +252,14 @@ module.exports.run = async (bot, msg, args, db) => {
                         'game': false,
                         'total': 0
                     })
-                    WinLooseF.addFields({name: "You now have ", value: `${credits[players.indexOf(msg.author.id)]} credits`})
+                    WinLooseF.addFields({
+                        name: "You now have ",
+                        value: `${credits[players.indexOf(msg.author.id)]} credits`
+                    })
+                    if (credits[players.indexOf(msg.author.id)] === 0) {
+                        msg.channel.send("Hmm looks like you are broke, here have 50 credits so you can earn up more!");
+                        credits[players.indexOf(msg.author.id)] = credits[players.indexOf(msg.author.id)] + 50;
+                    }
                     msg.channel.send(WinLooseF)
                     db.collection('blackjack').doc(msg.guild.id).update({
                         'credits': credits,
@@ -239,8 +280,11 @@ module.exports.run = async (bot, msg, args, db) => {
             }).then(() => {
                 if (args[0] == "credits" && players.includes(msg.author.id)) {
                     let Credits = new Discord.MessageEmbed().setColor("RANDOM")
-                    .setTitle("Credit balance")
-                    .addFields({name:"You currently have ", value:`${credits[players.indexOf(msg.author.id)]} credits!`})
+                        .setTitle("Credit balance")
+                        .addFields({
+                            name: "You currently have ",
+                            value: `${credits[players.indexOf(msg.author.id)]} credits!`
+                        })
                     msg.channel.send(Credits);
                     db.collection('blackjack').doc(msg.guild.id).update({
                         'credits': credits,
@@ -251,6 +295,7 @@ module.exports.run = async (bot, msg, args, db) => {
                 }
             })
         }
+        db.collection
     })
 }
 

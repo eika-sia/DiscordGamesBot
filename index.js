@@ -1,9 +1,10 @@
-
 // require packages
 const Discord = require('discord.js');
 const fs = require('fs');
 const got = require('got');
 require('dotenv/config');
+
+const Welcome = require("discord-welcome");
 
 // initialise are bot
 const bot = new Discord.Client();
@@ -19,7 +20,9 @@ const Firebase = require('firebase/app');
 const FieldValue = require('firebase-admin/').firestore.FieldValue;
 const admin = require('firebase-admin');
 const serviceAccount = require('./ServiceAccount.json');
-const { SSL_OP_SSLEAY_080_CLIENT_DH_BUG } = require('constants');
+const {
+    SSL_OP_SSLEAY_080_CLIENT_DH_BUG
+} = require('constants');
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
@@ -57,7 +60,19 @@ bot.on('ready', async () => {
 
 });
 
-
+bot.on('guildMemberAdd', member => {
+    db.collection('guilds').doc(member.guild.id).get().then((q) => {
+        if (q.exists) {
+            let WelcomeChannel = q.data().WelcomeChannel;
+        }
+    })
+    Welcome(bot, {
+        a: {
+            publicmsg: "welcome @MEMBER",
+            publicchannel: "test2"
+        }
+    });
+})
 bot.on('message', msg => {
     db.collection('guilds').doc(msg.guild.id).update({
         'guildMemberCount': msg.guild.memberCount
@@ -150,11 +165,11 @@ bot.on('guildCreate', async gData => {
         players: [],
         game: false,
         playersName: [],
-        bet : 0,
+        bet: 0,
         total: 0,
-        bet : 0
+        bet: 0
     })
 });
 
 // Bot login
-bot.login(process.env.token);
+bot.login("NzM4NjkzODQ5MDUxODI0MTYw.XyPoQQ.ztq6uEjjK4s_sdslAPTpS6XVETM");

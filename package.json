@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "discord-welcome": "^2.0.2",
     "discord.js": "^12.2.0",
     "dotenv": "^8.2.0",
     "firebase": "^7.17.1",

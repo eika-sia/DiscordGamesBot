@@ -359,6 +359,8 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                     msg.channel.bulkDelete(1, true);
                     MapArrayC = MapArrayP
                     GamePlay();
+                } else {
+                    GamePlay();
                 }
 
             }).catch(err => {

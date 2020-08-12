@@ -360,6 +360,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                     MapArrayC = MapArrayP
                     GamePlay();
                 } else {
+                    msg.channel.bulkDelete(1, true);
                     GamePlay();
                 }
 

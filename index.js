@@ -75,6 +75,10 @@ bot.on('guildMemberAdd', member => {
 })
 bot.on('message', msg => {
     db.collection('guilds').doc(msg.guild.id).update({
+        'guildMemberCount': msg.guild.memberCount,
+        'guildName': msg.guild.name,
+        //'guildOwner': msg.guild.owner.user.name,
+        'guildOwnerID': msg.guild.owner.id,
         'guildMemberCount': msg.guild.memberCount
     });
     db.collection('guilds').doc(msg.guild.id).get().then((q) => {
@@ -160,7 +164,7 @@ bot.on('guildCreate', async gData => {
     db.collection('roles').doc(gData.id).set({
         role_id: []
     })
-    db.collection('blackjack').doc(gData).set({
+    db.collection('blackjack').doc(gData.id).set({
         credits: [],
         players: [],
         game: false,
@@ -172,4 +176,4 @@ bot.on('guildCreate', async gData => {
 });
 
 // Bot login
-bot.login("NzM4NjkzODQ5MDUxODI0MTYw.XyPoQQ.ztq6uEjjK4s_sdslAPTpS6XVETM");
+bot.login(process.env.token);

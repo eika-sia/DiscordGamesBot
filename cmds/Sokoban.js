@@ -52,6 +52,8 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
         let BlockRowPos;
         let TargetColPos;
         let TargetRowPos;
+        let DeathRow = new Array();
+        let DeathCol = new Array();
 
         let Map = new Discord.MessageEmbed().setColor("RANDOM").setDescription("");
 
@@ -59,7 +61,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             //Adding players to the games save
             //if (!players.includes(UserId)) {
             //    console.log("adding new user! " + msg.author.id);
-                //Add 
+            //Add 
             //    players.push(UserId);
             //    wins.push(0);
             //}
@@ -72,12 +74,22 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             const block = ":regional_indicator_o:";
             const Target = "❎";
             const Bg = ":black_large_square:";
+            const DeathBlock = "❌"
 
             //Setting up the map
             let i;
 
             //Filling in the array for an empty map
             var MapArrayC = [
+                [],
+                [],
+                [],
+                [],
+                [],
+                [],
+                []
+            ]
+            var MapArrayP = [
                 [],
                 [],
                 [],
@@ -122,42 +134,67 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                 return Math.floor(Math.random() * (max - min)) + min;
             }
 
-            //player
-            PlayerColPos = ColPos(1, 7);
-            PlayerRowPos = RowPos(1, 5);
-            MapArrayC[PlayerRowPos][PlayerColPos] = player;
-
             //block
-            BlockColPos = ColPos(2, 6);
-            BlockRowPos = RowPos(2, 4);
-            if (PlayerRowPos === BlockRowPos && BlockColPos === PlayerColPos) {
+            for (i = 0; i < 1;) {
                 BlockColPos = ColPos(2, 6);
                 BlockRowPos = RowPos(2, 4);
+                if (MapArrayC[BlockRowPos][BlockColPos] === ":black_large_square:") {
+                    MapArrayC[BlockRowPos][BlockColPos] = block;
+                    MapArrayC[BlockRowPos+1][BlockColPos] = block;
+                    MapArrayC[BlockRowPos-1][BlockColPos] = block;
+                    MapArrayC[BlockRowPos][BlockColPos+1] = block;
+                    MapArrayC[BlockRowPos][BlockColPos-1] = block;
+                    i++
+                }
             }
-            MapArrayC[BlockRowPos][BlockColPos] = block;
+
+            //player
+            for (i = 0; i < 1;) {
+                PlayerColPos = ColPos(1, 7);
+                PlayerRowPos = RowPos(1, 5);
+                if (MapArrayC[PlayerRowPos][PlayerColPos] === ":black_large_square:") {
+                    MapArrayC[PlayerRowPos][PlayerColPos] = player;
+                    i++
+                }
+            }
 
             //Target
-            TargetColPos = ColPos(1, 7);
-            TargetRowPos = RowPos(1, 5);
-            if (TargetRowPos === BlockRowPos && TargetColPos === PlayerColPos) {
+            for (i = 0; i < 1;) {
                 TargetColPos = ColPos(1, 7);
                 TargetRowPos = RowPos(1, 5);
-            } else if (PlayerRowPos === TargetRowPos && TargetColPos === PlayerColPos) {
-                TargetColPos = ColPos(1, 7);
-                TargetRowPos = RowPos(1, 5);
+                if (MapArrayC[TargetRowPos][TargetColPos] === ":black_large_square:") {
+                    MapArrayC[TargetRowPos][TargetColPos] = Target;
+                    i++
+                }
             }
-            MapArrayC[TargetRowPos][TargetColPos] = Target;
 
-            function FillMap() {
+            //death block you figure
+            let SpawnPos = false;
+            for (i = 0; i < 3;) {
+                var Temp1 = ColPos(1, 7);
+                var Temp2 = RowPos(1, 5);
+                if (MapArrayC[Temp2][Temp1] === ":black_large_square:") {
+                    MapArrayC[Temp2][Temp1] = DeathBlock;
+                    DeathRow.push(Temp2);
+                    DeathCol.push(Temp1);
+                    i++
+                }
+            }
+
+            function FillMap(array) {
                 Map.setDescription("");
                 for (i = 0; i < 7; i++) {
                     for (j = 0; j < 9; j++) {
-                        Map.setDescription(`${Map.description}${MapArrayC[i][j]}`)
+                        Map.setDescription(`${Map.description}${array[i][j]}`)
                     }
                     Map.setDescription(`${Map.description}\n`)
                 }
             }
-            FillMap();
+            MapArrayC[BlockRowPos+1][BlockColPos] = ":black_large_square:";
+            MapArrayC[BlockRowPos-1][BlockColPos] = ":black_large_square:";
+            MapArrayC[BlockRowPos][BlockColPos+1] = ":black_large_square:";
+            MapArrayC[BlockRowPos][BlockColPos-1] = ":black_large_square:";
+            FillMap(MapArrayC);
             MapDraw();
             GamePlay();
         }
@@ -167,11 +204,29 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             //msg.channel.send(Map);
             MapMsg = await msg.channel.send(Map);
         }
+
         function GamePlay() {
             //Checking for winning
             if (TargetColPos === BlockColPos && BlockRowPos === TargetRowPos) {
-                return msg.channel.send("You win!");
+                Map.setTitle("You win!");
+                    MapMsg.edit(Map);
+                    return;
             }
+            //checking for loosing
+            for (i = 0; i < 3; i++) {
+                if (DeathCol[i] === BlockColPos && DeathRow[i] === BlockRowPos) {
+                    Map.setTitle("You loose!");
+                    MapMsg.edit(Map);
+                    return;
+
+                }
+                if (DeathCol[i] === PlayerColPos && DeathRow[i] === PlayerRowPos) {
+                    Map.setTitle("You loose!");
+                    MapMsg.edit(Map);
+                    return;
+                }
+            }
+
 
             //Filter mechanic
             const filter = m => m.author.id === msg.author.id;
@@ -188,6 +243,8 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                     Game = false;
                     return msg.channel.send("Game stopped!");
                 } else if (collected.first().content === "w") {
+                    //For undo
+
                     //Moving up
                     MapArrayC[PlayerRowPos][PlayerColPos] = ":black_large_square:"
                     PlayerRowPos = PlayerRowPos - 1;
@@ -208,12 +265,14 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                     }
 
                     MapArrayC[PlayerRowPos][PlayerColPos] = "😀"
-                    FillMap();
+                    FillMap(MapArrayC);
                     MapMsg.edit(Map);
                     msg.channel.bulkDelete(1, true);
                     GamePlay();
-
                 } else if (collected.first().content === "a") {
+                    //For undo
+
+
                     //moving left
                     MapArrayC[PlayerRowPos][PlayerColPos] = ":black_large_square:"
                     PlayerColPos = PlayerColPos - 1;
@@ -234,11 +293,16 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                     }
 
                     MapArrayC[PlayerRowPos][PlayerColPos] = "😀"
-                    FillMap();
+                    FillMap(MapArrayC);
                     MapMsg.edit(Map);
                     msg.channel.bulkDelete(1, true);
                     GamePlay();
                 } else if (collected.first().content === "s") {
+                    //For undo
+
+
+
+
                     MapArrayC[PlayerRowPos][PlayerColPos] = ":black_large_square:"
                     PlayerRowPos = PlayerRowPos + 1;
 
@@ -258,11 +322,13 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                     }
 
                     MapArrayC[PlayerRowPos][PlayerColPos] = "😀"
-                    FillMap();
+                    FillMap(MapArrayC);
                     MapMsg.edit(Map);
                     msg.channel.bulkDelete(1, true);
                     GamePlay();
                 } else if (collected.first().content === "d") {
+                    //For undo 
+
                     MapArrayC[PlayerRowPos][PlayerColPos] = ":black_large_square:"
                     PlayerColPos = PlayerColPos + 1;
 
@@ -282,13 +348,22 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                     }
 
                     MapArrayC[PlayerRowPos][PlayerColPos] = "😀"
-                    FillMap();
+                    FillMap(MapArrayC);
                     MapMsg.edit(Map);
                     msg.channel.bulkDelete(1, true);
                     GamePlay();
+                } else if (collected.first().content === "undo") {
+                    //undo fuxtion
+                    FillMap(MapArrayP);
+                    MapMsg.edit(Map);
+                    msg.channel.bulkDelete(1, true);
+                    MapArrayC = MapArrayP
+                    GamePlay();
                 }
+
             }).catch(err => {
-                msg.channel.send("Time expired!");
+                Map.setTitle("Time expired!");
+                MapMsg.edit(Map);
                 Game = false;
             })
         }

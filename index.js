@@ -73,6 +73,7 @@ bot.on('guildMemberAdd', member => {
         }
     });
 })
+
 bot.on('message', msg => {
     db.collection('guilds').doc(msg.guild.id).update({
         'guildMemberCount': msg.guild.memberCount,
@@ -86,7 +87,7 @@ bot.on('message', msg => {
             prefix = q.data().prefix
         }
     }).then(() => {
-
+        //prefix = "$";
         if (msg.channel.type === "dm") return;
         if (msg.author.bot) return;
 

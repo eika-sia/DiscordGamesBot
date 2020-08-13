@@ -60,6 +60,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
         let DeathCol = new Array();
         let EvilColPos;
         let EvilRowPos;
+        let EvilAlive;
 
         let grid = new Array();
 
@@ -210,6 +211,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
         async function MapDraw() {
             //msg.channel.send(Map);
             MapMsg = await msg.channel.send(Map);
+            EvilAlive = true;
         }
 
         //Evil bot pathfinding
@@ -232,17 +234,21 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             var start = graph.grid[EvilRowPos][EvilColPos];
             var end = graph.grid[PlayerRowPos][PlayerColPos];
             var result = astar.astar.search(graph, start, end);
-            for (i = 0; i < result.length; i++) {
-                console.log(`move number: ${i}, x: ${result[i].x}, y: ${result[i].y}`)
-            }
             MapArrayC[EvilRowPos][EvilColPos] = ":black_large_square:";
             EvilRowPos = result[0].x;
             EvilColPos = result[0].y;
+            if (EvilColPos === BlockColPos && EvilRowPos === BlockRowPos) {
+                EvilAlive = false;
+                EvilColPos="";
+                EvilRowPos="";
+                return;
+            }
             MapArrayC[EvilRowPos][EvilColPos] = "😡";
         }
 
         function GamePlay() {
             //Checking for winning
+
             if (TargetColPos === BlockColPos && BlockRowPos === TargetRowPos) {
                 Map.setTitle("You win!");
                 MapMsg.edit(Map);
@@ -262,16 +268,15 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                     return;
                 }
             }
+
+            //Crushing the evil boi
+            if (EvilAlive) {
+                pathfinding();
+            }
             if (EvilColPos === PlayerColPos && EvilRowPos === PlayerRowPos) {
                 Map.setTitle("You loose!");
                 MapMsg.edit(Map);
                 return;
-            }
-
-            //Crushing the evil boi
-            if (EvilColPos === BlockColPos && EvilRowPos === BlockRowPos) {
-                EvilRowPos = "";
-                EvilColPos = "";
             }
 
 
@@ -310,7 +315,6 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                         BlockRowPos = BlockRowPos - 1;
                         MapArrayC[BlockRowPos][BlockColPos] = ":regional_indicator_o:"
                     }
-                    pathfinding();
                     MapArrayC[PlayerRowPos][PlayerColPos] = "😀"
                     FillMap(MapArrayC);
                     MapMsg.edit(Map);
@@ -338,7 +342,6 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                         BlockColPos = BlockColPos - 1;
                         MapArrayC[BlockRowPos][BlockColPos] = ":regional_indicator_o:"
                     }
-                    pathfinding();
                     MapArrayC[PlayerRowPos][PlayerColPos] = "😀"
                     FillMap(MapArrayC);
                     MapMsg.edit(Map);
@@ -367,7 +370,6 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                         BlockRowPos = BlockRowPos + 1;
                         MapArrayC[BlockRowPos][BlockColPos] = ":regional_indicator_o:"
                     }
-                    pathfinding();
                     MapArrayC[PlayerRowPos][PlayerColPos] = "😀"
                     FillMap(MapArrayC);
                     MapMsg.edit(Map);
@@ -393,7 +395,6 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                         BlockColPos = BlockColPos + 1
                         MapArrayC[BlockRowPos][BlockColPos] = ":regional_indicator_o:"
                     }
-                    pathfinding();
                     MapArrayC[PlayerRowPos][PlayerColPos] = "😀"
                     FillMap(MapArrayC);
                     MapMsg.edit(Map);

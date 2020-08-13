@@ -86,6 +86,7 @@ bot.on('message', msg => {
             prefix = q.data().prefix
         }
     }).then(() => {
+        prefix="$";
         if (msg.channel.type === "dm") return;
         if (msg.author.bot) return;
 

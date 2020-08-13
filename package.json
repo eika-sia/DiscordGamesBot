@@ -15,6 +15,7 @@
     "firebase": "^7.17.1",
     "firebase-admin": "^9.0.0",
     "got": "^11.5.1",
+    "javascript-astar": "git+https://github.com/bgrins/javascript-astar.git",
     "ms": "^2.1.2"
   }
 }

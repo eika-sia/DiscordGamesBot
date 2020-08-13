@@ -1,3 +1,7 @@
+const {
+    path
+} = require('dotenv/lib/env-options');
+
 module.exports.run = async (bot, msg, args, db, UserId) => {
 
     const Discord = require('discord.js');
@@ -54,6 +58,10 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
         let TargetRowPos;
         let DeathRow = new Array();
         let DeathCol = new Array();
+        let EvilColPos;
+        let EvilRowPos;
+
+        let grid = new Array();
 
         let Map = new Discord.MessageEmbed().setColor("RANDOM").setDescription("");
 
@@ -140,10 +148,10 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                 BlockRowPos = RowPos(2, 4);
                 if (MapArrayC[BlockRowPos][BlockColPos] === ":black_large_square:") {
                     MapArrayC[BlockRowPos][BlockColPos] = block;
-                    MapArrayC[BlockRowPos+1][BlockColPos] = block;
-                    MapArrayC[BlockRowPos-1][BlockColPos] = block;
-                    MapArrayC[BlockRowPos][BlockColPos+1] = block;
-                    MapArrayC[BlockRowPos][BlockColPos-1] = block;
+                    MapArrayC[BlockRowPos + 1][BlockColPos] = block;
+                    MapArrayC[BlockRowPos - 1][BlockColPos] = block;
+                    MapArrayC[BlockRowPos][BlockColPos + 1] = block;
+                    MapArrayC[BlockRowPos][BlockColPos - 1] = block;
                     i++
                 }
             }
@@ -168,15 +176,12 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                 }
             }
 
-            //death block you figure
-            let SpawnPos = false;
-            for (i = 0; i < 3;) {
-                var Temp1 = ColPos(1, 7);
-                var Temp2 = RowPos(1, 5);
-                if (MapArrayC[Temp2][Temp1] === ":black_large_square:") {
-                    MapArrayC[Temp2][Temp1] = DeathBlock;
-                    DeathRow.push(Temp2);
-                    DeathCol.push(Temp1);
+            //Evil boi spawning
+            for (i = 0; i < 1;) {
+                EvilColPos = ColPos(1, 7);
+                EvilRowPos = RowPos(1, 5);
+                if (MapArrayC[EvilRowPos][EvilColPos] === ":black_large_square:") {
+                    MapArrayC[EvilRowPos][EvilColPos] = "😡";
                     i++
                 }
             }
@@ -184,16 +189,18 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             function FillMap(array) {
                 Map.setDescription("");
                 for (i = 0; i < 7; i++) {
-                    for (j = 0; j < 9; j++) {
+                    for (j = 0; j < 8; j = j + 2) {
                         Map.setDescription(`${Map.description}${array[i][j]}`)
+                        Map.setDescription(`${Map.description}${array[i][j+1]}`)
                     }
+                    Map.setDescription(`${Map.description}${array[i][8]}`)
                     Map.setDescription(`${Map.description}\n`)
                 }
             }
-            MapArrayC[BlockRowPos+1][BlockColPos] = ":black_large_square:";
-            MapArrayC[BlockRowPos-1][BlockColPos] = ":black_large_square:";
-            MapArrayC[BlockRowPos][BlockColPos+1] = ":black_large_square:";
-            MapArrayC[BlockRowPos][BlockColPos-1] = ":black_large_square:";
+            MapArrayC[BlockRowPos + 1][BlockColPos] = ":black_large_square:";
+            MapArrayC[BlockRowPos - 1][BlockColPos] = ":black_large_square:";
+            MapArrayC[BlockRowPos][BlockColPos + 1] = ":black_large_square:";
+            MapArrayC[BlockRowPos][BlockColPos - 1] = ":black_large_square:";
             FillMap(MapArrayC);
             MapDraw();
             GamePlay();
@@ -205,12 +212,41 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             MapMsg = await msg.channel.send(Map);
         }
 
+        //Evil bot pathfinding
+        function pathfinding() {
+            var Matrix = new Array();
+            Matrix = MapArrayC.map(x => x.slice())
+
+            //Formating to 0's and 1's
+            for (i = 0; i < 7; i++) {
+                for (j = 0; j < 9; j++) {
+                    if (Matrix[i][j] === "😀" || Matrix[i][j] === ":black_large_square:") {
+                        Matrix[i][j] = "0";
+                    } else {
+                        Matrix[i][j] = "1";
+                    }
+                }
+            }
+            const astar = require("../node_modules/javascript-astar/astar.js");
+            var graph = new astar.Graph(Matrix);
+            var start = graph.grid[EvilRowPos][EvilColPos];
+            var end = graph.grid[PlayerRowPos][PlayerColPos];
+            var result = astar.astar.search(graph, start, end);
+            for (i = 0; i < result.length; i++) {
+                console.log(`move number: ${i}, x: ${result[i].x}, y: ${result[i].y}`)
+            }
+            MapArrayC[EvilRowPos][EvilColPos] = ":black_large_square:";
+            EvilRowPos = result[0].x;
+            EvilColPos = result[0].y;
+            MapArrayC[EvilRowPos][EvilColPos] = "😡";
+        }
+
         function GamePlay() {
             //Checking for winning
             if (TargetColPos === BlockColPos && BlockRowPos === TargetRowPos) {
                 Map.setTitle("You win!");
-                    MapMsg.edit(Map);
-                    return;
+                MapMsg.edit(Map);
+                return;
             }
             //checking for loosing
             for (i = 0; i < 3; i++) {
@@ -225,6 +261,17 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                     MapMsg.edit(Map);
                     return;
                 }
+            }
+            if (EvilColPos === PlayerColPos && EvilRowPos === PlayerRowPos) {
+                Map.setTitle("You loose!");
+                MapMsg.edit(Map);
+                return;
+            }
+
+            //Crushing the evil boi
+            if (EvilColPos === BlockColPos && EvilRowPos === BlockRowPos) {
+                EvilRowPos = "";
+                EvilColPos = "";
             }
 
 
@@ -263,7 +310,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                         BlockRowPos = BlockRowPos - 1;
                         MapArrayC[BlockRowPos][BlockColPos] = ":regional_indicator_o:"
                     }
-
+                    pathfinding();
                     MapArrayC[PlayerRowPos][PlayerColPos] = "😀"
                     FillMap(MapArrayC);
                     MapMsg.edit(Map);
@@ -291,7 +338,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                         BlockColPos = BlockColPos - 1;
                         MapArrayC[BlockRowPos][BlockColPos] = ":regional_indicator_o:"
                     }
-
+                    pathfinding();
                     MapArrayC[PlayerRowPos][PlayerColPos] = "😀"
                     FillMap(MapArrayC);
                     MapMsg.edit(Map);
@@ -320,7 +367,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                         BlockRowPos = BlockRowPos + 1;
                         MapArrayC[BlockRowPos][BlockColPos] = ":regional_indicator_o:"
                     }
-
+                    pathfinding();
                     MapArrayC[PlayerRowPos][PlayerColPos] = "😀"
                     FillMap(MapArrayC);
                     MapMsg.edit(Map);
@@ -346,7 +393,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                         BlockColPos = BlockColPos + 1
                         MapArrayC[BlockRowPos][BlockColPos] = ":regional_indicator_o:"
                     }
-
+                    pathfinding();
                     MapArrayC[PlayerRowPos][PlayerColPos] = "😀"
                     FillMap(MapArrayC);
                     MapMsg.edit(Map);
@@ -365,6 +412,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                 }
 
             }).catch(err => {
+                console.log(err);
                 Map.setTitle("Time expired!");
                 MapMsg.edit(Map);
                 Game = false;

@@ -164,16 +164,23 @@ bot.on('guildCreate', async gData => {
     });
 
     db.collection('roles').doc(gData.id).set({
-        role_id: []
+        'role_id': []
     })
     db.collection('blackjack').doc(gData.id).set({
-        credits: [],
-        players: [],
-        game: false,
-        playersName: [],
-        bet: 0,
-        total: 0,
-        bet: 0
+        'credits': [],
+        'players': [],
+        'game': false,
+        'playersName': [],
+        'bet': 0,
+        'total': 0,
+        'bet': 0
+    }).then(() => {
+        db.collection('sokoban').doc(gData.id).set({
+            'players': new Array(),
+            'playerNames': new Array(),
+            'wins': new Array(),
+            'total games': new Array()
+        })
     })
 });
 

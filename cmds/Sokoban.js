@@ -5,12 +5,14 @@ const {
 module.exports.run = async (bot, msg, args, db, UserId) => {
 
     const Discord = require('discord.js');
-    let players, wins;
+    let players, wins, playerNames, totalGames = new Array();
     db.collection('sokoban').doc(msg.guild.id).get().then((q) => {
         //Getting variables from Firebase
         if (q.exists) {
             players = q.data().players;
             wins = q.data().wins;
+            playerNames = q.data().playerNames;
+            totalGames = q.data().totalGames;
         }
     }).then(() => {
         //help card for the game\
@@ -68,12 +70,20 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
 
         if (Game === true) {
             //Adding players to the games save
-            //if (!players.includes(UserId)) {
-            //    console.log("adding new user! " + msg.author.id);
-            //Add 
-            //    players.push(UserId);
-            //    wins.push(0);
-            //}
+            if (!players.includes(msg.author.id)) {
+                console.log("adding new user! " + msg.author.id);
+                //Add 
+                players.push(msg.author.id);
+                wins.push(0);
+                playerNames.push(msg.author.username);
+                totalGames.push(0);
+                db.collection('sokoban').doc(msg.guild.id).update({
+                    'players': players,
+                    'wins': wins,
+                    'playerNames': playerNames,
+                    'totalGames': totalGames
+                })
+            }
 
             //Basic static map
 
@@ -96,6 +106,8 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                 [],
                 [],
                 [],
+                [],
+                [],
                 []
             ]
             var MapArrayP = [
@@ -110,25 +122,25 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
 
             //Functions so it's easier to read
             function FullWall(Row) {
-                for (i = 0; i < 9; i++) {
+                for (i = 0; i < 13; i++) {
                     MapArrayC[Row][i] = wall
                 }
             }
             let j;
 
             function MidBg() {
-                for (j = 1; j < 6; j++) {
-                    for (i = 0; i < 8; i++) {
+                for (j = 1; j < 9; j++) {
+                    for (i = 0; i < 13; i++) {
                         MapArrayC[j][0] = wall;
                         MapArrayC[j][i + 1] = Bg;
-                        MapArrayC[j][8] = wall;
+                        MapArrayC[j][11] = wall;
                     }
                 }
             }
             //Calling the functions
             FullWall(0);
             MidBg();
-            FullWall(6);
+            FullWall(8);
 
             //Adding special objects
             let TempRow = 0,
@@ -145,8 +157,8 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
 
             //block
             for (i = 0; i < 1;) {
-                BlockColPos = ColPos(2, 6);
-                BlockRowPos = RowPos(2, 4);
+                BlockColPos = ColPos(3, 7);
+                BlockRowPos = RowPos(2, 6);
                 if (MapArrayC[BlockRowPos][BlockColPos] === ":black_large_square:") {
                     MapArrayC[BlockRowPos][BlockColPos] = block;
                     MapArrayC[BlockRowPos + 1][BlockColPos] = block;
@@ -159,8 +171,8 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
 
             //player
             for (i = 0; i < 1;) {
-                PlayerColPos = ColPos(1, 7);
-                PlayerRowPos = RowPos(1, 5);
+                PlayerColPos = ColPos(2, 8);
+                PlayerRowPos = RowPos(2, 6);
                 if (MapArrayC[PlayerRowPos][PlayerColPos] === ":black_large_square:") {
                     MapArrayC[PlayerRowPos][PlayerColPos] = player;
                     i++
@@ -169,8 +181,8 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
 
             //Target
             for (i = 0; i < 1;) {
-                TargetColPos = ColPos(1, 7);
-                TargetRowPos = RowPos(1, 5);
+                TargetColPos = ColPos(2, 8);
+                TargetRowPos = RowPos(2, 6);
                 if (MapArrayC[TargetRowPos][TargetColPos] === ":black_large_square:") {
                     MapArrayC[TargetRowPos][TargetColPos] = Target;
                     i++
@@ -178,23 +190,37 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             }
 
             //Evil boi spawning
-            for (i = 0; i < 1;) {
-                EvilColPos = ColPos(1, 7);
-                EvilRowPos = RowPos(1, 5);
+            for (i = 0; i < 2;) {
+                EvilColPos = ColPos(1, 9);
+                EvilRowPos = RowPos(1, 7);
                 if (MapArrayC[EvilRowPos][EvilColPos] === ":black_large_square:") {
-                    MapArrayC[EvilRowPos][EvilColPos] = "😡";
+                    if (EvilRowPos === 1 || EvilRowPos === 7) {
+                        MapArrayC[EvilRowPos][EvilColPos] = ":rage:"
+                        i++
+                    }
+                    if (EvilColPos === 1 || EvilColPos === 9) {
+                        MapArrayC[EvilRowPos][EvilColPos] = ":rage:"
+                        i++
+                    }
+                }
+            }
+
+            for (i = 0; i < 5;) {
+                DeathCol[i] = ColPos(1, 9);
+                DeathRow[i] = RowPos(1, 7);
+                if (MapArrayC[DeathRow[i]][DeathCol[i]] === ":black_large_square:") {
+                    MapArrayC[DeathRow[i]][DeathCol[i]] = "❌";
                     i++
                 }
             }
 
             function FillMap(array) {
                 Map.setDescription("");
-                for (i = 0; i < 7; i++) {
-                    for (j = 0; j < 8; j = j + 2) {
+                for (i = 0; i < 9; i++) {
+                    for (j = 0; j < 11; j = j + 2) {
                         Map.setDescription(`${Map.description}${array[i][j]}`)
                         Map.setDescription(`${Map.description}${array[i][j+1]}`)
                     }
-                    Map.setDescription(`${Map.description}${array[i][8]}`)
                     Map.setDescription(`${Map.description}\n`)
                 }
             }
@@ -220,8 +246,8 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             Matrix = MapArrayC.map(x => x.slice())
 
             //Formating to 0's and 1's
-            for (i = 0; i < 7; i++) {
-                for (j = 0; j < 9; j++) {
+            for (i = 0; i < 9; i++) {
+                for (j = 0; j < 11; j++) {
                     if (Matrix[i][j] === "😀" || Matrix[i][j] === ":black_large_square:") {
                         Matrix[i][j] = "0";
                     } else {
@@ -239,8 +265,8 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             EvilColPos = result[0].y;
             if (EvilColPos === BlockColPos && EvilRowPos === BlockRowPos) {
                 EvilAlive = false;
-                EvilColPos="";
-                EvilRowPos="";
+                EvilColPos = "";
+                EvilRowPos = "";
                 return;
             }
             MapArrayC[EvilRowPos][EvilColPos] = "😡";
@@ -248,176 +274,210 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
 
         function GamePlay() {
             //Checking for winning
+            db.collection('sokoban').doc(msg.guild.id).get().then((q) => {
+                //Getting variables from Firebase
+                if (q.exists) {
+                    players = q.data().players;
+                    wins = q.data().wins;
+                    playerNames = q.data().playerNames;
+                    totalGames = q.data().totalGames;
+                }
+            }).then(() => {
+                if (TargetColPos === BlockColPos && BlockRowPos === TargetRowPos) {
+                    Map.setTitle("You win!");
+                    MapMsg.edit(Map);
+                    totalGames[players.indexOf(msg.author.id)]+=1;
+                    wins[players.indexOf(msg.author.id)]+=1;
+                    db.collection('sokoban').doc(msg.guild.id).update({
+                        'wins': wins,
+                        'totalGames': totalGames
+                    });
+                    return;
+                }
+                //checking for loosing
+                for (i = 0; i < DeathCol.length; i++) {
+                    if (DeathCol[i] === BlockColPos && DeathRow[i] === BlockRowPos) {
+                        Map.setTitle("You loose!");
+                        MapMsg.edit(Map);
+                        totalGames[players.indexOf(msg.author.id)]+=1;
+                        db.collection('sokoban').doc(msg.guild.id).update({
+                            'wins': wins,
+                            'totalGames': totalGames
+                        });
+                        return;
+                    }
+                    if (DeathCol[i] === PlayerColPos && DeathRow[i] === PlayerRowPos) {
+                        Map.setTitle("You loose!");
+                        MapMsg.edit(Map);
+                        totalGames[players.indexOf(msg.author.id)]+=1;
+                        db.collection('sokoban').doc(msg.guild.id).update({
+                            'wins': wins,
+                            'totalGames': totalGames
+                        });
+                        return;
+                    }
+                }
 
-            if (TargetColPos === BlockColPos && BlockRowPos === TargetRowPos) {
-                Map.setTitle("You win!");
-                MapMsg.edit(Map);
-                return;
-            }
-            //checking for loosing
-            for (i = 0; i < 3; i++) {
-                if (DeathCol[i] === BlockColPos && DeathRow[i] === BlockRowPos) {
+                //Crushing the evil boi
+                if (EvilAlive) {
+                    pathfinding();
+                }
+                if (EvilColPos === PlayerColPos && EvilRowPos === PlayerRowPos) {
                     Map.setTitle("You loose!");
                     MapMsg.edit(Map);
+                    totalGames[players.indexOf(msg.author.id)]+=1;
+                    db.collection('sokoban').doc(msg.guild.id).update({
+                        'wins': wins,
+                        'totalGames': totalGames
+                    });
                     return;
-
                 }
-                if (DeathCol[i] === PlayerColPos && DeathRow[i] === PlayerRowPos) {
-                    Map.setTitle("You loose!");
+
+
+                //Filter mechanic
+                const filter = m => m.author.id === msg.author.id;
+
+
+                //Waiting for a response
+                msg.channel.awaitMessages(filter, {
+                    max: 1,
+                    time: 10000
+                }).then(collected => {
+                    //one got the response do this: (I'll probably make it if statments and function the game calls)
+                    //To add a function just add an if statment, If you want so game doesn't finish just add GamePlay(); at the end
+                    if (collected.first().content === "stop") {
+                        Game = false;
+                        totalGames[players.indexOf(msg.author.id)]+=1;
+                        db.collection('sokoban').doc(msg.guild.id).update({
+                            'wins': wins,
+                            'totalGames': totalGames
+                        });
+                        return msg.channel.send("Game stopped!");
+                    } else if (collected.first().content === "w") {
+                        //For undo
+
+                        //Moving up
+                        MapArrayC[PlayerRowPos][PlayerColPos] = ":black_large_square:"
+                        PlayerRowPos = PlayerRowPos - 1;
+
+                        //Checks for walls
+                        if (MapArrayC[PlayerRowPos][PlayerColPos] === ':purple_square:') {
+                            PlayerRowPos = PlayerRowPos + 1;
+                        }
+                        //cehcks for target area
+                        if (MapArrayC[PlayerRowPos][PlayerColPos] === '❎') {
+                            PlayerRowPos = PlayerRowPos + 1;
+                        }
+
+                        //Checks for the movable block
+                        if (PlayerRowPos === BlockRowPos && BlockColPos === PlayerColPos) {
+                            BlockRowPos = BlockRowPos - 1;
+                            MapArrayC[BlockRowPos][BlockColPos] = ":regional_indicator_o:"
+                        }
+                        MapArrayC[PlayerRowPos][PlayerColPos] = "😀"
+                        FillMap(MapArrayC);
+                        MapMsg.edit(Map);
+                        msg.channel.bulkDelete(1, true);
+                        GamePlay();
+                    } else if (collected.first().content === "a") {
+                        //For undo
+
+
+                        //moving left
+                        MapArrayC[PlayerRowPos][PlayerColPos] = ":black_large_square:"
+                        PlayerColPos = PlayerColPos - 1;
+
+                        //Checks for walls
+                        if (MapArrayC[PlayerRowPos][PlayerColPos] === ':purple_square:') {
+                            PlayerColPos = PlayerColPos + 1;
+                        }
+                        //checks for target area
+                        if (MapArrayC[PlayerRowPos][PlayerColPos] === "❎") {
+                            PlayerColPos = PlayerColPos + 1;
+                        }
+
+                        //Checks for the movable block
+                        if (PlayerRowPos === BlockRowPos && BlockColPos === PlayerColPos) {
+                            BlockColPos = BlockColPos - 1;
+                            MapArrayC[BlockRowPos][BlockColPos] = ":regional_indicator_o:"
+                        }
+                        MapArrayC[PlayerRowPos][PlayerColPos] = "😀"
+                        FillMap(MapArrayC);
+                        MapMsg.edit(Map);
+                        msg.channel.bulkDelete(1, true);
+                        GamePlay();
+                    } else if (collected.first().content === "s") {
+                        //For undo
+
+
+
+
+                        MapArrayC[PlayerRowPos][PlayerColPos] = ":black_large_square:"
+                        PlayerRowPos = PlayerRowPos + 1;
+
+                        //Checks for walls
+                        if (MapArrayC[PlayerRowPos][PlayerColPos] === ':purple_square:') {
+                            PlayerRowPos = PlayerRowPos - 1;
+                        }
+                        //checks for target area
+                        if (MapArrayC[PlayerRowPos][PlayerColPos] === '❎') {
+                            PlayerRowPos = PlayerRowPos - 1;
+                        }
+
+                        //Checks for the movable block
+                        if (PlayerRowPos === BlockRowPos && BlockColPos === PlayerColPos) {
+                            BlockRowPos = BlockRowPos + 1;
+                            MapArrayC[BlockRowPos][BlockColPos] = ":regional_indicator_o:"
+                        }
+                        MapArrayC[PlayerRowPos][PlayerColPos] = "😀"
+                        FillMap(MapArrayC);
+                        MapMsg.edit(Map);
+                        msg.channel.bulkDelete(1, true);
+                        GamePlay();
+                    } else if (collected.first().content === "d") {
+                        //For undo 
+
+                        MapArrayC[PlayerRowPos][PlayerColPos] = ":black_large_square:"
+                        PlayerColPos = PlayerColPos + 1;
+
+                        //Checks for walls
+                        if (MapArrayC[PlayerRowPos][PlayerColPos] === ':purple_square:') {
+                            PlayerColPos = PlayerColPos - 1;
+                        }
+                        //Checks for target area
+                        if (MapArrayC[PlayerRowPos][PlayerColPos] === '❎') {
+                            PlayerColPos = PlayerColPos - 1;
+                        }
+
+                        //Checks for the movable block
+                        if (PlayerRowPos === BlockRowPos && BlockColPos === PlayerColPos) {
+                            BlockColPos = BlockColPos + 1
+                            MapArrayC[BlockRowPos][BlockColPos] = ":regional_indicator_o:"
+                        }
+                        MapArrayC[PlayerRowPos][PlayerColPos] = "😀"
+                        FillMap(MapArrayC);
+                        MapMsg.edit(Map);
+                        msg.channel.bulkDelete(1, true);
+                        GamePlay();
+                    } else if (collected.first().content === "undo") {
+                        //undo fuxtion
+                        FillMap(MapArrayP);
+                        MapMsg.edit(Map);
+                        msg.channel.bulkDelete(1, true);
+                        MapArrayC = MapArrayP
+                        GamePlay();
+                    } else {
+                        msg.channel.bulkDelete(1, true);
+                        GamePlay();
+                    }
+
+                }).catch(err => {
+                    console.log(err);
+                    Map.setTitle("Time expired!");
                     MapMsg.edit(Map);
-                    return;
-                }
-            }
-
-            //Crushing the evil boi
-            if (EvilAlive) {
-                pathfinding();
-            }
-            if (EvilColPos === PlayerColPos && EvilRowPos === PlayerRowPos) {
-                Map.setTitle("You loose!");
-                MapMsg.edit(Map);
-                return;
-            }
-
-
-            //Filter mechanic
-            const filter = m => m.author.id === msg.author.id;
-
-
-            //Waiting for a response
-            msg.channel.awaitMessages(filter, {
-                max: 1,
-                time: 10000
-            }).then(collected => {
-                //one got the response do this: (I'll probably make it if statments and function the game calls)
-                //To add a function just add an if statment, If you want so game doesn't finish just add GamePlay(); at the end
-                if (collected.first().content === "stop") {
                     Game = false;
-                    return msg.channel.send("Game stopped!");
-                } else if (collected.first().content === "w") {
-                    //For undo
-
-                    //Moving up
-                    MapArrayC[PlayerRowPos][PlayerColPos] = ":black_large_square:"
-                    PlayerRowPos = PlayerRowPos - 1;
-
-                    //Checks for walls
-                    if (MapArrayC[PlayerRowPos][PlayerColPos] === ':purple_square:') {
-                        PlayerRowPos = PlayerRowPos + 1;
-                    }
-                    //cehcks for target area
-                    if (MapArrayC[PlayerRowPos][PlayerColPos] === '❎') {
-                        PlayerRowPos = PlayerRowPos + 1;
-                    }
-
-                    //Checks for the movable block
-                    if (PlayerRowPos === BlockRowPos && BlockColPos === PlayerColPos) {
-                        BlockRowPos = BlockRowPos - 1;
-                        MapArrayC[BlockRowPos][BlockColPos] = ":regional_indicator_o:"
-                    }
-                    MapArrayC[PlayerRowPos][PlayerColPos] = "😀"
-                    FillMap(MapArrayC);
-                    MapMsg.edit(Map);
-                    msg.channel.bulkDelete(1, true);
-                    GamePlay();
-                } else if (collected.first().content === "a") {
-                    //For undo
-
-
-                    //moving left
-                    MapArrayC[PlayerRowPos][PlayerColPos] = ":black_large_square:"
-                    PlayerColPos = PlayerColPos - 1;
-
-                    //Checks for walls
-                    if (MapArrayC[PlayerRowPos][PlayerColPos] === ':purple_square:') {
-                        PlayerColPos = PlayerColPos + 1;
-                    }
-                    //checks for target area
-                    if (MapArrayC[PlayerRowPos][PlayerColPos] === "❎") {
-                        PlayerColPos = PlayerColPos + 1;
-                    }
-
-                    //Checks for the movable block
-                    if (PlayerRowPos === BlockRowPos && BlockColPos === PlayerColPos) {
-                        BlockColPos = BlockColPos - 1;
-                        MapArrayC[BlockRowPos][BlockColPos] = ":regional_indicator_o:"
-                    }
-                    MapArrayC[PlayerRowPos][PlayerColPos] = "😀"
-                    FillMap(MapArrayC);
-                    MapMsg.edit(Map);
-                    msg.channel.bulkDelete(1, true);
-                    GamePlay();
-                } else if (collected.first().content === "s") {
-                    //For undo
-
-
-
-
-                    MapArrayC[PlayerRowPos][PlayerColPos] = ":black_large_square:"
-                    PlayerRowPos = PlayerRowPos + 1;
-
-                    //Checks for walls
-                    if (MapArrayC[PlayerRowPos][PlayerColPos] === ':purple_square:') {
-                        PlayerRowPos = PlayerRowPos - 1;
-                    }
-                    //checks for target area
-                    if (MapArrayC[PlayerRowPos][PlayerColPos] === '❎') {
-                        PlayerRowPos = PlayerRowPos - 1;
-                    }
-
-                    //Checks for the movable block
-                    if (PlayerRowPos === BlockRowPos && BlockColPos === PlayerColPos) {
-                        BlockRowPos = BlockRowPos + 1;
-                        MapArrayC[BlockRowPos][BlockColPos] = ":regional_indicator_o:"
-                    }
-                    MapArrayC[PlayerRowPos][PlayerColPos] = "😀"
-                    FillMap(MapArrayC);
-                    MapMsg.edit(Map);
-                    msg.channel.bulkDelete(1, true);
-                    GamePlay();
-                } else if (collected.first().content === "d") {
-                    //For undo 
-
-                    MapArrayC[PlayerRowPos][PlayerColPos] = ":black_large_square:"
-                    PlayerColPos = PlayerColPos + 1;
-
-                    //Checks for walls
-                    if (MapArrayC[PlayerRowPos][PlayerColPos] === ':purple_square:') {
-                        PlayerColPos = PlayerColPos - 1;
-                    }
-                    //Checks for target area
-                    if (MapArrayC[PlayerRowPos][PlayerColPos] === '❎') {
-                        PlayerColPos = PlayerColPos - 1;
-                    }
-
-                    //Checks for the movable block
-                    if (PlayerRowPos === BlockRowPos && BlockColPos === PlayerColPos) {
-                        BlockColPos = BlockColPos + 1
-                        MapArrayC[BlockRowPos][BlockColPos] = ":regional_indicator_o:"
-                    }
-                    MapArrayC[PlayerRowPos][PlayerColPos] = "😀"
-                    FillMap(MapArrayC);
-                    MapMsg.edit(Map);
-                    msg.channel.bulkDelete(1, true);
-                    GamePlay();
-                } else if (collected.first().content === "undo") {
-                    //undo fuxtion
-                    FillMap(MapArrayP);
-                    MapMsg.edit(Map);
-                    msg.channel.bulkDelete(1, true);
-                    MapArrayC = MapArrayP
-                    GamePlay();
-                } else {
-                    msg.channel.bulkDelete(1, true);
-                    GamePlay();
-                }
-
-            }).catch(err => {
-                console.log(err);
-                Map.setTitle("Time expired!");
-                MapMsg.edit(Map);
-                Game = false;
-            })
+                })
+            });
         }
     });
 }

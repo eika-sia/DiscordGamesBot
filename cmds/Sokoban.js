@@ -342,12 +342,6 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                 MapArrayC[EvilRowPos][EvilColPos] = ":black_large_square:";
                 EvilRowPos = result[0].x;
                 EvilColPos = result[0].y;
-                if (EvilColPos === BlockColPos && EvilRowPos === BlockRowPos) {
-                    EvilAlive = false;
-                    EvilColPos = "";
-                    EvilRowPos = "";
-                    return;
-                }
                 MapArrayC[EvilRowPos][EvilColPos] = "😡";
             }
 
@@ -399,7 +393,14 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
 
                     //Crushing the evil boi
                     if (EvilAlive) {
-                        pathfinding();
+                        if (EvilColPos === BlockColPos && EvilRowPos === BlockRowPos) {
+                            EvilAlive = false;
+                            EvilColPos = "";
+                            EvilRowPos = "";
+                            return;
+                        } else {
+                            pathfinding();
+                        }
                     }
                     if (EvilColPos === PlayerColPos && EvilRowPos === PlayerRowPos) {
                         Map.setTitle("You loose!");

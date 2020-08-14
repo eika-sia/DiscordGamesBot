@@ -179,7 +179,7 @@ bot.on('guildCreate', async gData => {
             'players': new Array(),
             'playerNames': new Array(),
             'wins': new Array(),
-            'total games': new Array()
+            'totalGames': new Array()
         })
     })
 });

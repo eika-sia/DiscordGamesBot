@@ -269,7 +269,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                 }
 
                 //Evil boi spawning
-                for (i = 0; i < 2;) {
+                for (i = 0; i < 1;) {
                     EvilColPos = ColPos(1, 9);
                     EvilRowPos = RowPos(1, 7);
                     if (MapArrayC[EvilRowPos][EvilColPos] === ":black_large_square:") {
@@ -284,7 +284,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                     }
                 }
 
-                for (i = 0; i < 5;) {
+                for (i = 0; i < 3;) {
                     DeathCol[i] = ColPos(1, 9);
                     DeathRow[i] = RowPos(1, 7);
                     if (MapArrayC[DeathRow[i]][DeathCol[i]] === ":black_large_square:") {

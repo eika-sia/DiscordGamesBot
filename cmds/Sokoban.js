@@ -163,18 +163,6 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                         'totalGames': totalGames
                     })
                 }
-
-                //Basic static map
-
-                //Variables for blocks
-                const player = "😀";
-                const wall = ":purple_square:";
-                const block = ":regional_indicator_o:";
-                const Target = "❎";
-                const Bg = ":black_large_square:";
-                const DeathBlock = "❌"
-
-                //Setting up the map
                 let i;
 
                 //Filling in the array for an empty map
@@ -189,110 +177,121 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                     [],
                     []
                 ]
-                var MapArrayP = [
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                    [],
-                    []
-                ]
+                function MapGen() {
+                    //Basic static map
 
-                //Functions so it's easier to read
-                function FullWall(Row) {
-                    for (i = 0; i < 13; i++) {
-                        MapArrayC[Row][i] = wall
-                    }
-                }
-                let j;
+                    //Variables for blocks
+                    const player = "😀";
+                    const wall = ":purple_square:";
+                    const block = ":regional_indicator_o:";
+                    const Target = "❎";
+                    const Bg = ":black_large_square:";
+                    const DeathBlock = "❌"
 
-                function MidBg() {
-                    for (j = 1; j < 9; j++) {
+                    //Setting up the map
+
+                    //Functions so it's easier to read
+                    function FullWall(Row) {
                         for (i = 0; i < 13; i++) {
-                            MapArrayC[j][0] = wall;
-                            MapArrayC[j][i + 1] = Bg;
-                            MapArrayC[j][11] = wall;
+                            MapArrayC[Row][i] = wall
                         }
                     }
-                }
-                //Calling the functions
-                FullWall(0);
-                MidBg();
-                FullWall(8);
+                    let j;
 
-                //Adding special objects
-                let TempRow = 0,
-                    TempCol = 0;
-
-                //General random position
-                function ColPos(min, max) {
-                    return Math.floor(Math.random() * (max - min)) + min;
-                }
-
-                function RowPos(min, max) {
-                    return Math.floor(Math.random() * (max - min)) + min;
-                }
-
-                //block
-                for (i = 0; i < 1;) {
-                    BlockColPos = ColPos(3, 7);
-                    BlockRowPos = RowPos(2, 6);
-                    if (MapArrayC[BlockRowPos][BlockColPos] === ":black_large_square:") {
-                        MapArrayC[BlockRowPos][BlockColPos] = block;
-                        MapArrayC[BlockRowPos + 1][BlockColPos] = block;
-                        MapArrayC[BlockRowPos - 1][BlockColPos] = block;
-                        MapArrayC[BlockRowPos][BlockColPos + 1] = block;
-                        MapArrayC[BlockRowPos][BlockColPos - 1] = block;
-                        i++
-                    }
-                }
-
-                //player
-                for (i = 0; i < 1;) {
-                    PlayerColPos = ColPos(2, 8);
-                    PlayerRowPos = RowPos(2, 6);
-                    if (MapArrayC[PlayerRowPos][PlayerColPos] === ":black_large_square:") {
-                        MapArrayC[PlayerRowPos][PlayerColPos] = player;
-                        i++
-                    }
-                }
-
-                //Target
-                for (i = 0; i < 1;) {
-                    TargetColPos = ColPos(2, 8);
-                    TargetRowPos = RowPos(2, 6);
-                    if (MapArrayC[TargetRowPos][TargetColPos] === ":black_large_square:") {
-                        MapArrayC[TargetRowPos][TargetColPos] = Target;
-                        i++
-                    }
-                }
-
-                //Evil boi spawning
-                for (i = 0; i < 1;) {
-                    EvilColPos = ColPos(1, 9);
-                    EvilRowPos = RowPos(1, 7);
-                    if (MapArrayC[EvilRowPos][EvilColPos] === ":black_large_square:") {
-                        if (EvilRowPos === 1 || EvilRowPos === 7) {
-                            MapArrayC[EvilRowPos][EvilColPos] = ":rage:"
-                            i++
+                    function MidBg() {
+                        for (j = 1; j < 9; j++) {
+                            for (i = 0; i < 13; i++) {
+                                MapArrayC[j][0] = wall;
+                                MapArrayC[j][i + 1] = Bg;
+                                MapArrayC[j][11] = wall;
+                            }
                         }
-                        if (EvilColPos === 1 || EvilColPos === 9) {
-                            MapArrayC[EvilRowPos][EvilColPos] = ":rage:"
+                    }
+                    //Calling the functions
+                    FullWall(0);
+                    MidBg();
+                    FullWall(8);
+
+                    //Adding special objects
+                    let TempRow = 0,
+                        TempCol = 0;
+
+                    //General random position
+                    function ColPos(min, max) {
+                        return Math.floor(Math.random() * (max - min)) + min;
+                    }
+
+                    function RowPos(min, max) {
+                        return Math.floor(Math.random() * (max - min)) + min;
+                    }
+
+                    //block
+                    for (i = 0; i < 1;) {
+                        BlockColPos = ColPos(3, 7);
+                        BlockRowPos = RowPos(2, 6);
+                        if (MapArrayC[BlockRowPos][BlockColPos] === ":black_large_square:") {
+                            MapArrayC[BlockRowPos][BlockColPos] = block;
+                            MapArrayC[BlockRowPos + 1][BlockColPos] = block;
+                            MapArrayC[BlockRowPos - 1][BlockColPos] = block;
+                            MapArrayC[BlockRowPos][BlockColPos + 1] = block;
+                            MapArrayC[BlockRowPos][BlockColPos - 1] = block;
                             i++
                         }
                     }
-                }
 
-                for (i = 0; i < 3;) {
-                    DeathCol[i] = ColPos(1, 9);
-                    DeathRow[i] = RowPos(1, 7);
-                    if (MapArrayC[DeathRow[i]][DeathCol[i]] === ":black_large_square:") {
-                        MapArrayC[DeathRow[i]][DeathCol[i]] = "❌";
-                        i++
+                    //player
+                    for (i = 0; i < 1;) {
+                        PlayerColPos = ColPos(2, 8);
+                        PlayerRowPos = RowPos(2, 6);
+                        if (MapArrayC[PlayerRowPos][PlayerColPos] === ":black_large_square:") {
+                            MapArrayC[PlayerRowPos][PlayerColPos] = player;
+                            i++
+                        }
                     }
-                }
 
+                    //Target
+                    for (i = 0; i < 1;) {
+                        TargetColPos = ColPos(2, 8);
+                        TargetRowPos = RowPos(2, 6);
+                        if (MapArrayC[TargetRowPos][TargetColPos] === ":black_large_square:") {
+                            MapArrayC[TargetRowPos][TargetColPos] = Target;
+                            i++
+                        }
+                    }
+
+                    //Evil boi spawning
+                    for (i = 0; i < 1;) {
+                        EvilColPos = ColPos(1, 9);
+                        EvilRowPos = RowPos(1, 7);
+                        if (MapArrayC[EvilRowPos][EvilColPos] === ":black_large_square:") {
+                            if (EvilRowPos === 1 || EvilRowPos === 7) {
+                                MapArrayC[EvilRowPos][EvilColPos] = ":rage:"
+                                i++
+                            }
+                            if (EvilColPos === 1 || EvilColPos === 9) {
+                                MapArrayC[EvilRowPos][EvilColPos] = ":rage:"
+                                i++
+                            }
+                        }
+                    }
+
+                    for (i = 0; i < 3;) {
+                        DeathCol[i] = ColPos(1, 9);
+                        DeathRow[i] = RowPos(1, 7);
+                        if (MapArrayC[DeathRow[i]][DeathCol[i]] === ":black_large_square:") {
+                            MapArrayC[DeathRow[i]][DeathCol[i]] = "❌";
+                            i++
+                        }
+                    }
+
+                    MapArrayC[BlockRowPos + 1][BlockColPos] = ":black_large_square:";
+                    MapArrayC[BlockRowPos - 1][BlockColPos] = ":black_large_square:";
+                    MapArrayC[BlockRowPos][BlockColPos + 1] = ":black_large_square:";
+                    MapArrayC[BlockRowPos][BlockColPos - 1] = ":black_large_square:";
+                    FillMap(MapArrayC);
+                    MapDraw();
+                    GamePlay();
+                }
                 function FillMap(array) {
                     Map.setDescription("");
                     for (i = 0; i < 9; i++) {
@@ -303,13 +302,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                         Map.setDescription(`${Map.description}\n`)
                     }
                 }
-                MapArrayC[BlockRowPos + 1][BlockColPos] = ":black_large_square:";
-                MapArrayC[BlockRowPos - 1][BlockColPos] = ":black_large_square:";
-                MapArrayC[BlockRowPos][BlockColPos + 1] = ":black_large_square:";
-                MapArrayC[BlockRowPos][BlockColPos - 1] = ":black_large_square:";
-                FillMap(MapArrayC);
-                MapDraw();
-                GamePlay();
+                MapGen();
             }
             //This function will be looped untill the end of the game
             let MapMsg;
@@ -345,10 +338,11 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                 MapArrayC[EvilRowPos][EvilColPos] = "😡";
             }
 
+
             function GamePlay() {
                 //Checking for winning
                 db.collection('sokoban').doc(msg.guild.id).get().then((q) => {
-                    //Getting variables from Firebase
+                    //Getting variables from Firebase (Firestore)
                     if (q.exists) {
                         players = q.data().players;
                         wins = q.data().wins;
@@ -357,7 +351,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                     }
                 }).then(() => {
                     if (TargetColPos === BlockColPos && BlockRowPos === TargetRowPos) {
-                        Map.setTitle("You win!");
+                        Map.setTitle("You win this level!");
                         MapMsg.edit(Map);
                         totalGames[players.indexOf(msg.author.id)] += 1;
                         wins[players.indexOf(msg.author.id)] += 1;
@@ -365,7 +359,23 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                             'wins': wins,
                             'totalGames': totalGames
                         });
-                        return;
+                        for (i = 4; i < 8; i++) {
+                            MapArrayC[0][i] = ":black_large_square:"
+                        }
+                        for (i = 4; i < 8; i++) {
+                            MapArrayC[8][i] = ":black_large_square:"
+                        }
+                        for (i = 3; i < 6; i++) {
+                            MapArrayC[i][0] = ":black_large_square:"
+                        }
+                        for (i = 3; i < 6; i++) {
+                            MapArrayC[i][11] = ":black_large_square:"
+                        }
+                        FillMap(MapArrayC);
+                        MapMsg.edit(Map);
+                        EvilAlive = false;
+                        BlockColPos = "";
+                        BlockRowPos = "";
                     }
                     //checking for loosing
                     for (i = 0; i < DeathCol.length; i++) {
@@ -413,10 +423,17 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                         return;
                     }
 
+                    let MapArrayP;
+
+                    //Checking for map crossing
+
+                    if (PlayerColPos === 11 && PlayerRowPos > 2 && PlayerRowPos < 7) {
+                        Map.setTitle("");
+                        return MapGen();
+                    }
 
                     //Filter mechanic
                     const filter = m => m.author.id === msg.author.id;
-
 
                     //Waiting for a response
                     msg.channel.awaitMessages(filter, {
@@ -544,7 +561,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                             FillMap(MapArrayP);
                             MapMsg.edit(Map);
                             msg.channel.bulkDelete(1, true);
-                            MapArrayC = MapArrayP
+                            MapArrayC = MapArrayP.map(x => x.slice())
                             GamePlay();
                         } else {
                             msg.channel.bulkDelete(1, true);
@@ -552,11 +569,12 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                         }
 
                     }).catch(err => {
+                        console.log(err)
                         Map.setTitle("Time expired!");
                         MapMsg.edit(Map);
                         totalGames[players.indexOf(msg.author.id)] += 1;
                         db.collection('sokoban').doc(msg.guild.id).update({
-                            'totalGames' : totalGames
+                            'totalGames': totalGames
                         })
                         Game = false;
                     })

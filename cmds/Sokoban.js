@@ -552,7 +552,6 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                         }
 
                     }).catch(err => {
-                        console.log(err);
                         Map.setTitle("Time expired!");
                         MapMsg.edit(Map);
                         Game = false;

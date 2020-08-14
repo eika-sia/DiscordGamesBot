@@ -554,6 +554,10 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                     }).catch(err => {
                         Map.setTitle("Time expired!");
                         MapMsg.edit(Map);
+                        totalGames[players.indexOf(msg.author.id)] += 1;
+                        db.collection('sokoban').doc(msg.guild.id).update({
+                            'totalGames' : totalGames
+                        })
                         Game = false;
                     })
                 });

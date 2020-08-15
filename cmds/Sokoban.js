@@ -177,6 +177,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                     [],
                     []
                 ]
+
                 function MapGen() {
                     //Basic static map
 
@@ -292,6 +293,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                     MapDraw();
                     GamePlay();
                 }
+
                 function FillMap(array) {
                     Map.setDescription("");
                     for (i = 0; i < 9; i++) {
@@ -428,6 +430,15 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                     //Checking for map crossing
 
                     if (PlayerColPos === 11 && PlayerRowPos > 2 && PlayerRowPos < 7) {
+                        Map.setTitle("");
+                        return MapGen();
+                    } else if (PlayerRowPos === 0 && PlayerColPos > 3 && PlayerColPos < 9) {
+                        Map.setTitle("");
+                        return MapGen();
+                    } else if (PlayerRowPos === 8 && PlayerColPos > 3 && PlayerColPos < 9) {
+                        Map.setTitle("");
+                        return MapGen();
+                    } else if (PlayerColPos === 0 && PlayerRowPos > 2 && PlayerRowPos < 7) {
                         Map.setTitle("");
                         return MapGen();
                     }

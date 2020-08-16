@@ -344,7 +344,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             }
 
             //Evil bot pathfinding
-            function pathfinding() {
+            async function pathfinding() {
                 var Matrix = new Array();
                 Matrix = MapArrayC.map(x => x.slice())
                 const astar = require("../node_modules/javascript-astar/astar");
@@ -430,7 +430,16 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                             EvilRowPos = "";
                             return;
                         } else {
-                            pathfinding()
+                            pathfinding().catch(err => {
+                                Map.setTitle("You loose!");
+                                MapMsg.edit(Map);
+                                totalGames[players.indexOf(msg.author.id)] += 1;
+                                db.collection('sokoban').doc(msg.guild.id).update({
+                                    'wins': wins,
+                                    'totalGames': totalGames
+                                });
+                                return;
+                            });
                         }
                     }
 

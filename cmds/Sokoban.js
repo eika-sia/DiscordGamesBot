@@ -154,7 +154,6 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                     players.push(msg.author.id);
                     wins.push(0);
                     playerNames.push(msg.author.username);
-                    console.log(typeof totalGames);
                     totalGames.push(0);
                     db.collection('sokoban').doc(msg.guild.id).update({
                         'players': players,
@@ -182,12 +181,13 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                     //Basic static map
 
                     //Variables for blocks
-                    const player = "😀";
-                    const wall = ":purple_square:";
-                    const block = ":regional_indicator_o:";
-                    const Target = "❎";
-                    const Bg = ":black_large_square:";
-                    const DeathBlock = "❌"
+                    const player = 1;
+                    const wall = 5;
+                    const block = 2;
+                    const Target = 3;
+                    const Bg = 0;
+                    const DeathBlock = 4;
+                    const rage = 6;
 
                     //Setting up the map
 
@@ -201,7 +201,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
 
                     function MidBg() {
                         for (j = 1; j < 9; j++) {
-                            for (i = 0; i < 13; i++) {
+                            for (i = 0; i < 11; i++) {
                                 MapArrayC[j][0] = wall;
                                 MapArrayC[j][i + 1] = Bg;
                                 MapArrayC[j][11] = wall;
@@ -230,7 +230,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                     for (i = 0; i < 1;) {
                         BlockColPos = ColPos(3, 7);
                         BlockRowPos = RowPos(2, 6);
-                        if (MapArrayC[BlockRowPos][BlockColPos] === ":black_large_square:") {
+                        if (MapArrayC[BlockRowPos][BlockColPos] === 0) {
                             MapArrayC[BlockRowPos][BlockColPos] = block;
                             MapArrayC[BlockRowPos + 1][BlockColPos] = block;
                             MapArrayC[BlockRowPos - 1][BlockColPos] = block;
@@ -244,7 +244,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                     for (i = 0; i < 1;) {
                         PlayerColPos = ColPos(2, 8);
                         PlayerRowPos = RowPos(2, 6);
-                        if (MapArrayC[PlayerRowPos][PlayerColPos] === ":black_large_square:") {
+                        if (MapArrayC[PlayerRowPos][PlayerColPos] === 0) {
                             MapArrayC[PlayerRowPos][PlayerColPos] = player;
                             i++
                         }
@@ -254,7 +254,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                     for (i = 0; i < 1;) {
                         TargetColPos = ColPos(2, 8);
                         TargetRowPos = RowPos(2, 6);
-                        if (MapArrayC[TargetRowPos][TargetColPos] === ":black_large_square:") {
+                        if (MapArrayC[TargetRowPos][TargetColPos] === 0) {
                             MapArrayC[TargetRowPos][TargetColPos] = Target;
                             i++
                         }
@@ -264,13 +264,13 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                     for (i = 0; i < 1;) {
                         EvilColPos = ColPos(1, 9);
                         EvilRowPos = RowPos(1, 7);
-                        if (MapArrayC[EvilRowPos][EvilColPos] === ":black_large_square:") {
+                        if (MapArrayC[EvilRowPos][EvilColPos] === 0) {
                             if (EvilRowPos === 1 || EvilRowPos === 7) {
-                                MapArrayC[EvilRowPos][EvilColPos] = ":rage:"
+                                MapArrayC[EvilRowPos][EvilColPos] = 6
                                 i++
                             }
                             if (EvilColPos === 1 || EvilColPos === 9) {
-                                MapArrayC[EvilRowPos][EvilColPos] = ":rage:"
+                                MapArrayC[EvilRowPos][EvilColPos] = 6
                                 i++
                             }
                         }
@@ -279,16 +279,16 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                     for (i = 0; i < 3;) {
                         DeathCol[i] = ColPos(1, 9);
                         DeathRow[i] = RowPos(1, 7);
-                        if (MapArrayC[DeathRow[i]][DeathCol[i]] === ":black_large_square:") {
-                            MapArrayC[DeathRow[i]][DeathCol[i]] = "❌";
+                        if (MapArrayC[DeathRow[i]][DeathCol[i]] === 0) {
+                            MapArrayC[DeathRow[i]][DeathCol[i]] = 4;
                             i++
                         }
                     }
 
-                    MapArrayC[BlockRowPos + 1][BlockColPos] = ":black_large_square:";
-                    MapArrayC[BlockRowPos - 1][BlockColPos] = ":black_large_square:";
-                    MapArrayC[BlockRowPos][BlockColPos + 1] = ":black_large_square:";
-                    MapArrayC[BlockRowPos][BlockColPos - 1] = ":black_large_square:";
+                    MapArrayC[BlockRowPos + 1][BlockColPos] = 0;
+                    MapArrayC[BlockRowPos - 1][BlockColPos] = 0;
+                    MapArrayC[BlockRowPos][BlockColPos + 1] = 0;
+                    MapArrayC[BlockRowPos][BlockColPos - 1] = 0;
                     FillMap(MapArrayC);
                     MapDraw();
                     GamePlay();
@@ -298,8 +298,37 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                     Map.setDescription("");
                     for (i = 0; i < 9; i++) {
                         for (j = 0; j < 11; j = j + 2) {
-                            Map.setDescription(`${Map.description}${array[i][j]}`)
-                            Map.setDescription(`${Map.description}${array[i][j+1]}`)
+                            if (array[i][j] === 0) {
+                                Map.setDescription(`${Map.description}:black_large_square:`);
+                            } else if (array[i][j] === 5) {
+                                Map.setDescription(`${Map.description}:purple_square:`);
+                            } else if (array[i][j] === 4) {
+                                Map.setDescription(`${Map.description}:x:`);
+                            } else if (array[i][j] === 1) {
+                                Map.setDescription(`${Map.description}:grinning:`);
+                            } else if (array[i][j] === 2) {
+                                Map.setDescription(`${Map.description}:regional_indicator_o:`);
+                            } else if (array[i][j] === 3) {
+                                Map.setDescription(`${Map.description}❎`);
+                            } else if (array[i][j] === 6) {
+                                Map.setDescription(`${Map.description}:rage:`);
+                            }
+
+                            if (array[i][j + 1] === 0) {
+                                Map.setDescription(`${Map.description}:black_large_square:`);
+                            } else if (array[i][j + 1] === 5) {
+                                Map.setDescription(`${Map.description}:purple_square:`);
+                            } else if (array[i][j + 1] === 4) {
+                                Map.setDescription(`${Map.description}:x:`);
+                            } else if (array[i][j + 1] === 1) {
+                                Map.setDescription(`${Map.description}:grinning:`);
+                            } else if (array[i][j + 1] === 2) {
+                                Map.setDescription(`${Map.description}:regional_indicator_o:`);
+                            } else if (array[i][j + 1] === 3) {
+                                Map.setDescription(`${Map.description}❎`);
+                            } else if (array[i][j + 1] === 6) {
+                                Map.setDescription(`${Map.description}:rage:`);
+                            }
                         }
                         Map.setDescription(`${Map.description}\n`)
                     }
@@ -318,26 +347,16 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             function pathfinding() {
                 var Matrix = new Array();
                 Matrix = MapArrayC.map(x => x.slice())
-
-                //Formating to 0's and 1's
-                for (i = 0; i < 9; i++) {
-                    for (j = 0; j < 11; j++) {
-                        if (Matrix[i][j] === "😀" || Matrix[i][j] === ":black_large_square:") {
-                            Matrix[i][j] = "0";
-                        } else {
-                            Matrix[i][j] = "1";
-                        }
-                    }
-                }
-                const astar = require("../node_modules/javascript-astar/astar.js");
+                const astar = require("../node_modules/javascript-astar/astar");
                 var graph = new astar.Graph(Matrix);
                 var start = graph.grid[EvilRowPos][EvilColPos];
                 var end = graph.grid[PlayerRowPos][PlayerColPos];
                 var result = astar.astar.search(graph, start, end);
-                MapArrayC[EvilRowPos][EvilColPos] = ":black_large_square:";
+                MapArrayC[EvilRowPos][EvilColPos] = 0;
                 EvilRowPos = result[0].x;
                 EvilColPos = result[0].y;
-                MapArrayC[EvilRowPos][EvilColPos] = "😡";
+
+                MapArrayC[EvilRowPos][EvilColPos] = 6;
             }
 
 
@@ -362,16 +381,16 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                             'totalGames': totalGames
                         });
                         for (i = 4; i < 8; i++) {
-                            MapArrayC[0][i] = ":black_large_square:"
+                            MapArrayC[0][i] = 0
                         }
                         for (i = 4; i < 8; i++) {
-                            MapArrayC[8][i] = ":black_large_square:"
+                            MapArrayC[8][i] = 0
                         }
                         for (i = 3; i < 6; i++) {
-                            MapArrayC[i][0] = ":black_large_square:"
+                            MapArrayC[i][0] = 0
                         }
                         for (i = 3; i < 6; i++) {
-                            MapArrayC[i][11] = ":black_large_square:"
+                            MapArrayC[i][11] = 0
                         }
                         FillMap(MapArrayC);
                         MapMsg.edit(Map);
@@ -411,9 +430,10 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                             EvilRowPos = "";
                             return;
                         } else {
-                            pathfinding();
+                            pathfinding()
                         }
                     }
+
                     if (EvilColPos === PlayerColPos && EvilRowPos === PlayerRowPos) {
                         Map.setTitle("You loose!");
                         MapMsg.edit(Map);
@@ -429,16 +449,16 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
 
                     //Checking for map crossing
 
-                    if (PlayerColPos === 11 && PlayerRowPos > 2 && PlayerRowPos < 7) {
+                    if (PlayerColPos === 11 && PlayerRowPos > 2 && PlayerRowPos < 7 && EvilAlive === false) {
                         Map.setTitle("");
                         return MapGen();
-                    } else if (PlayerRowPos === 0 && PlayerColPos > 3 && PlayerColPos < 9) {
+                    } else if (PlayerRowPos === 0 && PlayerColPos > 3 && PlayerColPos < 9 && EvilAlive === false) {
                         Map.setTitle("");
                         return MapGen();
-                    } else if (PlayerRowPos === 8 && PlayerColPos > 3 && PlayerColPos < 9) {
+                    } else if (PlayerRowPos === 8 && PlayerColPos > 3 && PlayerColPos < 9 && EvilAlive === false) {
                         Map.setTitle("");
                         return MapGen();
-                    } else if (PlayerColPos === 0 && PlayerRowPos > 2 && PlayerRowPos < 7) {
+                    } else if (PlayerColPos === 0 && PlayerRowPos > 2 && PlayerRowPos < 7 && EvilAlive === false) {
                         Map.setTitle("");
                         return MapGen();
                     }
@@ -465,24 +485,24 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                             //For undo
 
                             //Moving up
-                            MapArrayC[PlayerRowPos][PlayerColPos] = ":black_large_square:"
+                            MapArrayC[PlayerRowPos][PlayerColPos] = 0
                             PlayerRowPos = PlayerRowPos - 1;
 
                             //Checks for walls
-                            if (MapArrayC[PlayerRowPos][PlayerColPos] === ':purple_square:') {
+                            if (MapArrayC[PlayerRowPos][PlayerColPos] === 5) {
                                 PlayerRowPos = PlayerRowPos + 1;
                             }
                             //cehcks for target area
-                            if (MapArrayC[PlayerRowPos][PlayerColPos] === '❎') {
+                            if (MapArrayC[PlayerRowPos][PlayerColPos] === 3) {
                                 PlayerRowPos = PlayerRowPos + 1;
                             }
 
                             //Checks for the movable block
                             if (PlayerRowPos === BlockRowPos && BlockColPos === PlayerColPos) {
                                 BlockRowPos = BlockRowPos - 1;
-                                MapArrayC[BlockRowPos][BlockColPos] = ":regional_indicator_o:"
+                                MapArrayC[BlockRowPos][BlockColPos] = 2
                             }
-                            MapArrayC[PlayerRowPos][PlayerColPos] = "😀"
+                            MapArrayC[PlayerRowPos][PlayerColPos] = 1
                             FillMap(MapArrayC);
                             MapMsg.edit(Map);
                             msg.channel.bulkDelete(1, true);
@@ -492,24 +512,24 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
 
 
                             //moving left
-                            MapArrayC[PlayerRowPos][PlayerColPos] = ":black_large_square:"
+                            MapArrayC[PlayerRowPos][PlayerColPos] = 0
                             PlayerColPos = PlayerColPos - 1;
 
                             //Checks for walls
-                            if (MapArrayC[PlayerRowPos][PlayerColPos] === ':purple_square:') {
+                            if (MapArrayC[PlayerRowPos][PlayerColPos] === 5) {
                                 PlayerColPos = PlayerColPos + 1;
                             }
                             //checks for target area
-                            if (MapArrayC[PlayerRowPos][PlayerColPos] === "❎") {
+                            if (MapArrayC[PlayerRowPos][PlayerColPos] === 3) {
                                 PlayerColPos = PlayerColPos + 1;
                             }
 
                             //Checks for the movable block
                             if (PlayerRowPos === BlockRowPos && BlockColPos === PlayerColPos) {
                                 BlockColPos = BlockColPos - 1;
-                                MapArrayC[BlockRowPos][BlockColPos] = ":regional_indicator_o:"
+                                MapArrayC[BlockRowPos][BlockColPos] = 2
                             }
-                            MapArrayC[PlayerRowPos][PlayerColPos] = "😀"
+                            MapArrayC[PlayerRowPos][PlayerColPos] = 1
                             FillMap(MapArrayC);
                             MapMsg.edit(Map);
                             msg.channel.bulkDelete(1, true);
@@ -520,24 +540,24 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
 
 
 
-                            MapArrayC[PlayerRowPos][PlayerColPos] = ":black_large_square:"
+                            MapArrayC[PlayerRowPos][PlayerColPos] = 0
                             PlayerRowPos = PlayerRowPos + 1;
 
                             //Checks for walls
-                            if (MapArrayC[PlayerRowPos][PlayerColPos] === ':purple_square:') {
+                            if (MapArrayC[PlayerRowPos][PlayerColPos] === 5) {
                                 PlayerRowPos = PlayerRowPos - 1;
                             }
                             //checks for target area
-                            if (MapArrayC[PlayerRowPos][PlayerColPos] === '❎') {
+                            if (MapArrayC[PlayerRowPos][PlayerColPos] === 3) {
                                 PlayerRowPos = PlayerRowPos - 1;
                             }
 
                             //Checks for the movable block
                             if (PlayerRowPos === BlockRowPos && BlockColPos === PlayerColPos) {
                                 BlockRowPos = BlockRowPos + 1;
-                                MapArrayC[BlockRowPos][BlockColPos] = ":regional_indicator_o:"
+                                MapArrayC[BlockRowPos][BlockColPos] = 2
                             }
-                            MapArrayC[PlayerRowPos][PlayerColPos] = "😀"
+                            MapArrayC[PlayerRowPos][PlayerColPos] = 1
                             FillMap(MapArrayC);
                             MapMsg.edit(Map);
                             msg.channel.bulkDelete(1, true);
@@ -545,24 +565,24 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                         } else if (collected.first().content === "d") {
                             //For undo 
 
-                            MapArrayC[PlayerRowPos][PlayerColPos] = ":black_large_square:"
+                            MapArrayC[PlayerRowPos][PlayerColPos] = 0
                             PlayerColPos = PlayerColPos + 1;
 
                             //Checks for walls
-                            if (MapArrayC[PlayerRowPos][PlayerColPos] === ':purple_square:') {
+                            if (MapArrayC[PlayerRowPos][PlayerColPos] === 5) {
                                 PlayerColPos = PlayerColPos - 1;
                             }
                             //Checks for target area
-                            if (MapArrayC[PlayerRowPos][PlayerColPos] === '❎') {
+                            if (MapArrayC[PlayerRowPos][PlayerColPos] === 3) {
                                 PlayerColPos = PlayerColPos - 1;
                             }
 
                             //Checks for the movable block
                             if (PlayerRowPos === BlockRowPos && BlockColPos === PlayerColPos) {
                                 BlockColPos = BlockColPos + 1
-                                MapArrayC[BlockRowPos][BlockColPos] = ":regional_indicator_o:"
+                                MapArrayC[BlockRowPos][BlockColPos] = 2
                             }
-                            MapArrayC[PlayerRowPos][PlayerColPos] = "😀"
+                            MapArrayC[PlayerRowPos][PlayerColPos] = 1
                             FillMap(MapArrayC);
                             MapMsg.edit(Map);
                             msg.channel.bulkDelete(1, true);
@@ -580,7 +600,6 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                         }
 
                     }).catch(err => {
-                        console.log(err)
                         Map.setTitle("Time expired!");
                         MapMsg.edit(Map);
                         totalGames[players.indexOf(msg.author.id)] += 1;

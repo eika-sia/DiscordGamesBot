@@ -6,7 +6,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
    * ? 2. Generate a starting position for food and for snake, Sokobans generation should work - done
    * ? 3. Make snake move, intervals could work good - done
    * ? 4. Make Snake an array of positions (better if we do it from the start) - done
-   * TODO 5. Make snake expandable, for loop that applies same +-x +-y
+   * ? 5. Make snake expandable, for loop that applies same +-x +-y - done
    * ? 6. Make a help file - done
    * *For expansion apply movement*(-1) to last part
    */
@@ -69,7 +69,8 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
     let PlayingField = new Array();
     let PlayingEmbed = new Discord.MessageEmbed()
       .setColor("RANDOM")
-      .setDescription("");
+      .setDescription("")
+      .setTitle("Eaten apples: 0");
 
     for (i = 0; i < TableRows; i++) {
       PlayingField.push([]);
@@ -194,8 +195,9 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
 
     let Direction = "";
     //*Main loop of the game
+    let AppleCounter = 0;
     function Gameplay() {
-      //TODO Checks for diff stuff (Winning - apple collections, loosing - hitting the wall - eating yourself {make something fun like bit off insted of loose})
+      //? Checks for diff stuff (Winning - apple collections, loosing - hitting the wall - eating yourself {make something fun like bit off insted of loose}) -done
       let AppleRows = ApplePosArray[0];
       let AppleCols = ApplePosArray[1];
       let SnakeRows = SnakePosArray[0][0];
@@ -213,7 +215,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             }
           }
 
-          //TODO add the snake add a part on the back
+          //? add the snake add a part on the back - done
           let TempRow = SnakePosArray[SnakePosArray.length - 1][0];
           let TempCol = SnakePosArray[SnakePosArray.length - 1][1];
 
@@ -231,8 +233,25 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
           SnakePosArray[SnakePosArray.length] = [TempRow, TempCol];
 
           render();
-          msg.channel.send(PlayingEmbed);
+          AppleCounter++;
+          PlayingEmbed.setTitle(`Eaten apples: ${AppleCounter}`);
+          MapMsg.edit(PlayingEmbed);
           return Gameplay();
+        }
+      }
+      //TODO Fixing the fact that you can go through walls
+      for (i = 0; i < SnakePosArray.length; i++) {
+        let TempRow = SnakePosArray[i][0];
+        let TempCol = SnakePosArray[i][1];
+
+        if (
+          TempRow === 0 ||
+          TempRow === TableRows - 1 ||
+          TempCol === 0 ||
+          TempCol === TableCols - 1
+        ) {
+          PlayingEmbed.setTitle("You loose!");
+          return MapMsg.edit(PlayingEmbed);
         }
       }
 
@@ -249,7 +268,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             snakeMove(up);
 
             render();
-            msg.channel.send(PlayingEmbed);
+            MapMsg.edit(PlayingEmbed);
             msg.channel.bulkDelete(1, true);
             Direction = "w";
             Gameplay();
@@ -258,7 +277,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             TempRow = SnakePosArray[0][0];
             TempCol = SnakePosArray[0][1];
             render();
-            msg.channel.send(PlayingEmbed);
+            MapMsg.edit(PlayingEmbed);
             msg.channel.bulkDelete(1, true);
             Direction = "s";
             Gameplay();
@@ -266,7 +285,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             snakeMove(left);
 
             render();
-            msg.channel.send(PlayingEmbed);
+            MapMsg.edit(PlayingEmbed);
             msg.channel.bulkDelete(1, true);
             Direction = "a";
             Gameplay();
@@ -274,7 +293,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             snakeMove(right);
 
             render();
-            msg.channel.send(PlayingEmbed);
+            MapMsg.edit(PlayingEmbed);
             msg.channel.bulkDelete(1, true);
             Direction = "d";
             Gameplay();
@@ -285,35 +304,35 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             snakeMove(up);
 
             render();
-            msg.channel.send(PlayingEmbed);
+            MapMsg.edit(PlayingEmbed);
 
             Gameplay();
           } else if (Direction === "s") {
             snakeMove(down);
 
             render();
-            msg.channel.send(PlayingEmbed);
+            MapMsg.edit(PlayingEmbed);
 
             Gameplay();
           } else if (Direction === "a") {
             snakeMove(left);
 
             render();
-            msg.channel.send(PlayingEmbed);
+            MapMsg.edit(PlayingEmbed);
 
             Gameplay();
           } else if (Direction === "d") {
             snakeMove(right);
 
             render();
-            msg.channel.send(PlayingEmbed);
+            MapMsg.edit(PlayingEmbed);
 
             Gameplay();
           } else if (Direction === "") {
             snakeMove(right);
 
             render();
-            msg.channel.send(PlayingEmbed);
+            MapMsg.edit(PlayingEmbed);
 
             Gameplay();
           }

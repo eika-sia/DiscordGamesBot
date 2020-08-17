@@ -6,6 +6,12 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
   let argsF = new Array();
   argsF = args;
   if (argsF.length === 0) {
+    let prefix;
+    db.collection('guilds').doc(msg.guild.id).get().then((q) => {
+      if(q.exists) {
+        prefix = q.data().prefix;
+      }
+    })
     const SokobanHelp = new Discord.MessageEmbed()
       .setTitle("Sokoban!")
       .setDescription("You need to push boxes in designated areas!")

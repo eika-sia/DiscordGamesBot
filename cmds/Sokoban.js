@@ -29,7 +29,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
               value: "move the player",
             },
             {
-              name: "cancel",
+              name: "stop",
               value: "Stop the game (you can also win to stop it)",
             },
             {

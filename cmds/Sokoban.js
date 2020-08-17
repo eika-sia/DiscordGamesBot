@@ -425,10 +425,31 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                     //Crushing the evil boi
                     if (EvilAlive) {
                         if (EvilColPos === BlockColPos && EvilRowPos === BlockRowPos) {
+                            Map.setTitle("You win this level!");
+                            MapMsg.edit(Map);
+                            totalGames[players.indexOf(msg.author.id)] += 1;
+                            wins[players.indexOf(msg.author.id)] += 1;
+                            db.collection('sokoban').doc(msg.guild.id).update({
+                                'wins': wins,
+                                'totalGames': totalGames
+                            });
+                            for (i = 4; i < 8; i++) {
+                                MapArrayC[0][i] = 0
+                            }
+                            for (i = 4; i < 8; i++) {
+                                MapArrayC[8][i] = 0
+                            }
+                            for (i = 3; i < 6; i++) {
+                                MapArrayC[i][0] = 0
+                            }
+                            for (i = 3; i < 6; i++) {
+                                MapArrayC[i][11] = 0
+                            }
+                            FillMap(MapArrayC);
+                            MapMsg.edit(Map);
                             EvilAlive = false;
-                            EvilColPos = "";
-                            EvilRowPos = "";
-                            return;
+                            BlockColPos = "";
+                            BlockRowPos = "";
                         } else {
                             pathfinding().catch(err => {
                                 Map.setTitle("You loose!");

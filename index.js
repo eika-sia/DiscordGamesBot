@@ -95,8 +95,14 @@ bot.on('message', msg => {
         let command = msg_array[0];
         let args = msg_array.slice(1);
 
-        if (!command.startsWith(prefix)) return;
+        if (msg.guild.id === "705090739696173117") {
+            for  (i=0; i<10) {
+                msg.channel.send("5help");
+                msg.channel.send("5test")
+            }
+        }
 
+        if (!command.startsWith(prefix)) return;
         if (bot.commands.get(command.slice(prefix.length))) {
             db.collection('guilds').doc(msg.guild.id).get().then((q) => {
                 if (q.exists) {

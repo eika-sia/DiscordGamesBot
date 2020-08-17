@@ -7,49 +7,54 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
   argsF = args;
   if (argsF.length === 0) {
     let prefix;
-    db.collection('guilds').doc(msg.guild.id).get().then((q) => {
-      if(q.exists) {
-        prefix = q.data().prefix;
-      }
-    })
-    const SokobanHelp = new Discord.MessageEmbed()
-      .setTitle("Sokoban!")
-      .setDescription("You need to push boxes in designated areas!")
-      .addFields(
-        {
-          name: `${prefix}Sokoban start`,
-          value: "Start the game",
-        },
-        {
-          name: "w, a, s, d",
-          value: "move the player",
-        },
-        {
-          name: "cancel",
-          value: "Stop the game (you can also win to stop it)",
-        },
-        {
-          name: "How to play?",
-          value:
-            "Enter w, a, s, d (standard controls) to move the charater over the map grid and push boxes! Write stop to stop the game",
-        },
-        {
-          name: "What are all the blocks?",
-          value:
-            ":purple_square: - wall, :regional_indicator_o: - movable block, \n ❎ - Your target, 😀 - You!",
-        },
-        {
-          name: `${prefix}Sokoban top`,
-          value: "Returns top 3 players of sokoban",
+    db.collection("guilds")
+      .doc(msg.guild.id)
+      .get()
+      .then((q) => {
+        if (q.exists) {
+          prefix = q.data().prefix;
         }
-      )
-      .setColor("RANDOM");
-    //Sending the first msgs
-    msg.channel.send("Doing math in background for optimal gameplay");
-    msg.channel
-      .send(SokobanHelp)
-      .then((r) => r.delete(10000))
-      .catch((err) => {});
+      })
+      .then(() => {
+        const SokobanHelp = new Discord.MessageEmbed()
+          .setTitle("Sokoban!")
+          .setDescription("You need to push boxes in designated areas!")
+          .addFields(
+            {
+              name: `${prefix}Sokoban start`,
+              value: "Start the game",
+            },
+            {
+              name: "w, a, s, d",
+              value: "move the player",
+            },
+            {
+              name: "cancel",
+              value: "Stop the game (you can also win to stop it)",
+            },
+            {
+              name: "How to play?",
+              value:
+                "Enter w, a, s, d (standard controls) to move the charater over the map grid and push boxes! Write stop to stop the game",
+            },
+            {
+              name: "What are all the blocks?",
+              value:
+                ":purple_square: - wall, :regional_indicator_o: - movable block, \n ❎ - Your target, 😀 - You!",
+            },
+            {
+              name: `${prefix}Sokoban top`,
+              value: "Returns top 3 players of sokoban",
+            }
+          )
+          .setColor("RANDOM");
+        //Sending the first msgs
+        msg.channel.send("Doing math in background for optimal gameplay");
+        msg.channel
+          .send(SokobanHelp)
+          .then((r) => r.delete(10000))
+          .catch((err) => {});
+      });
   }
   if (args[0] === "top") {
     let playerNames = new Array(),

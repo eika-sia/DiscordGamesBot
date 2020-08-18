@@ -562,6 +562,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             },
           ])
           .setTitle("Top apples!");
+          msg.channel.send(TopApples);
       });
   }
 };

@@ -19,37 +19,46 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
   const down = [1, 0];
   const left = [0, -1];
   const right = [0, 1];
-
-  if (argsF.length === 0) {
-    const snakeHelp = new Discord.MessageEmbed()
-      .setColor("RANDOM")
-      .setTitle("A game of snake!")
-      .setDescription("Come on, everyone knows how to play snake")
-      .addFields(
-        {
-          name: `${prefix}snake start`,
-          value: "Start the game",
-        },
-        {
-          name: "w, a, s, d",
-          value: "move the snake",
-        },
-        {
-          name: "stop",
-          value: "Stop the game (you can also win to stop it)",
-        },
-        {
-          name: "How to play?",
-          value:
-            "Enter w, a, s, d (standard controls) to move the charater over the map grid and push boxes! Write stop to stop the game",
-        },
-        {
-          name: `${prefix}snake top`,
-          value: "Returns top 3 players of sokoban",
-        }
-      );
-    msg.channel.send(snakeHelp);
-  }
+  db.collection("guilds")
+    .doc(msg.guild.id)
+    .get()
+    .then((q) => {
+      if (q.exists) {
+        prefix = q.data().prefix;
+      }
+    })
+    .then(() => {
+      if (argsF.length === 0) {
+        const snakeHelp = new Discord.MessageEmbed()
+          .setColor("RANDOM")
+          .setTitle("A game of snake!")
+          .setDescription("Come on, everyone knows how to play snake")
+          .addFields(
+            {
+              name: `${prefix}snake start`,
+              value: "Start the game",
+            },
+            {
+              name: "w, a, s, d",
+              value: "move the snake",
+            },
+            {
+              name: "stop",
+              value: "Stop the game (you can also win to stop it)",
+            },
+            {
+              name: "How to play?",
+              value:
+                "Enter w, a, s, d (standard controls) to move the charater over the map grid and push boxes! Write stop to stop the game",
+            },
+            {
+              name: `${prefix}snake top`,
+              value: "Returns top 3 players of snake",
+            }
+          );
+        msg.channel.send(snakeHelp);
+      }
+    });
   if (argsF[0] === "start") {
     // ? Task 1, 2 --- Map generation --- Will try to implement movement array - Task 4
 
@@ -216,17 +225,76 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
           }
 
           //? add the snake add a part on the back - done
-          let TempRow = SnakePosArray[SnakePosArray.length - 1][0];
-          let TempCol = SnakePosArray[SnakePosArray.length - 1][1];
-
-          if (Direction === "w") {
-            TempRow = TempRow + 1;
-          } else if (Direction === "s") {
-            TempRow = TempRow - 1;
-          } else if (Direction === "d") {
-            TempCol = TempCol - 1;
-          } else if (Direction === "a") {
-            TempCol = TempCol + 1;
+          let TempRow = "",
+            TempCol = "";
+          for (i = 0; i < 1; ) {
+            TempRow = SnakePosArray[SnakePosArray.length - 1][0];
+            TempCol = SnakePosArray[SnakePosArray.length - 1][1];
+            if (Direction === "w") {
+              TempRow = TempRow + 1;
+              if (PlayingField[TempRow][TempCol] === 0) {
+                i++;
+              } else {
+                TempRow = TempRow - 1;
+                TempCol = TempCol - 1;
+                if (PlayingField[TempRow][TempCol] === 0) {
+                  i++;
+                } else {
+                  TempCol = TempCol + 2;
+                  if (PlayingField[TempRow][TempCol] === 0) {
+                    i++;
+                  }
+                }
+              }
+            } else if (Direction === "s") {
+              TempRow = TempRow - 1;
+              if (PlayingField[TempRow][TempCol] === 0) {
+                i++;
+              } else {
+                TempRow = TempRow + 1;
+                TempCol = TempCol - 1;
+                if (PlayingField[TempRow][TempCol] === 0) {
+                  i++;
+                } else {
+                  TempCol = TempCol + 2;
+                  if (PlayingField[TempRow][TempCol] === 0) {
+                    i++;
+                  }
+                }
+              }
+            } else if (Direction === "d") {
+              TempCol = TempCol - 1;
+              if (PlayingField[TempRow][TempCol] === 0) {
+                i++;
+              } else {
+                TempCol = TempCol + 1;
+                TempRow = TempRow - 1;
+                if (PlayingField[TempRow][TempCol] === 0) {
+                  i++;
+                } else {
+                  TempRow = TempRow + 2;
+                  if (PlayingField[TempRow][TempCol] === 0) {
+                    i++;
+                  }
+                }
+              }
+            } else if (Direction === "a") {
+              TempCol = TempCol + 1;
+              if (PlayingField[TempRow][TempCol] === 0) {
+                i++;
+              } else {
+                TempCol = TempCol - 1;
+                TempRow = TempRow - 1;
+                if (PlayingField[TempRow][TempCol] === 0) {
+                  i++;
+                } else {
+                  TempRow = TempRow + 2;
+                  if (PlayingField[TempRow][TempCol] === 0) {
+                    i++;
+                  }
+                }
+              }
+            }
           }
 
           PlayingField[TempRow][TempCol] = snakeBody;
@@ -252,6 +320,22 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
         ) {
           PlayingEmbed.setTitle("You loose!");
           return MapMsg.edit(PlayingEmbed);
+        }
+      }
+      if (SnakePosArray.length > 3) {
+        for (i = 1; i < SnakePosArray.length; i++) {
+          let HeadRow = SnakePosArray[0][0];
+          let HeadCol = SnakePosArray[0][1];
+
+          let TempRow = SnakePosArray[i][0];
+          let TempCol = SnakePosArray[i][1];
+
+          if (HeadRow === TempRow) {
+            if (HeadCol === TempCol) {
+              PlayingEmbed.setTitle("You loose!");
+              return MapMsg.edit(PlayingEmbed);
+            }
+          }
         }
       }
 

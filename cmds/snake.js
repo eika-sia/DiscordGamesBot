@@ -543,6 +543,25 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             }
           }
         }
+      })
+      .then(() => {
+        const TopApples = new Discord.MessageEmbed()
+          .setColor("RANDOM")
+          .addFields([
+            {
+              name: `${userNames[0]}:`,
+              value: `${applesTop[0]}`,
+            },
+            {
+              name: `${userNames[1]}:`,
+              value: `${applesTop[1]}`,
+            },
+            {
+              name: `${userNames[2]}:`,
+              value: `${applesTop[2]}`,
+            },
+          ])
+          .setTitle("Top apples!");
       });
   }
 };

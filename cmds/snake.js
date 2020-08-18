@@ -60,6 +60,35 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
       }
     });
   if (argsF[0] === "start") {
+    //*Player adding from firebase
+    let players = new Array(),
+      applesTop = new Array(),
+      userNames = new Array();
+    db.collection("snake")
+      .doc(msg.guild.id)
+      .get()
+      .then((q) => {
+        if (q.exists) {
+          players = q.data().players;
+          applesTop = q.data().applesTop;
+          userNames = q.data().userNames;
+        }
+      })
+      .then(() => {
+        if (!players.includes(msg.author.id)) {
+          console.log("adding new user! " + msg.author.id);
+          //Add
+          players.push(msg.author.id);
+          applesTop.push(0);
+          userNames.push(msg.author.username);
+          db.collection("snake").doc(msg.guild.id).update({
+            players: players,
+            applesTop: applesTop,
+            userNames: userNames,
+          });
+        }
+      });
+
     // ? Task 1, 2 --- Map generation --- Will try to implement movement array - Task 4
 
     //* Constants for charaters in the game matrix
@@ -319,6 +348,24 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
           TempCol === TableCols - 1
         ) {
           PlayingEmbed.setTitle("You loose!");
+
+          db.collection("snake")
+            .doc(msg.guild.id)
+            .get()
+            .then((q) => {
+              if (q.exists) {
+                players = q.data().players;
+                applesTop = q.data().applesTop;
+                userNames = q.data().userNames;
+              }
+            });
+          if (applesTop[players.indexOf(msg.author.id)] < AppleCounter) {
+            applesTop[players.indexOf(msg.author.id)] = AppleCounter;
+            db.collection("snake").doc(msg.guild.id).update({
+              applesTop: applesTop,
+            });
+          }
+
           return MapMsg.edit(PlayingEmbed);
         }
       }
@@ -333,6 +380,24 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
           if (HeadRow === TempRow) {
             if (HeadCol === TempCol) {
               PlayingEmbed.setTitle("You loose!");
+
+              db.collection("snake")
+                .doc(msg.guild.id)
+                .get()
+                .then((q) => {
+                  if (q.exists) {
+                    players = q.data().players;
+                    applesTop = q.data().applesTop;
+                    userNames = q.data().userNames;
+                  }
+                });
+              if (applesTop[players.indexOf(msg.author.id)] < AppleCounter) {
+                applesTop[players.indexOf(msg.author.id)] = AppleCounter;
+                db.collection("snake").doc(msg.guild.id).update({
+                  applesTop: applesTop,
+                });
+              }
+
               return MapMsg.edit(PlayingEmbed);
             }
           }
@@ -347,6 +412,22 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
         })
         .then((collected) => {
           if (collected.first().content === "stop") {
+            db.collection("snake")
+              .doc(msg.guild.id)
+              .get()
+              .then((q) => {
+                if (q.exists) {
+                  players = q.data().players;
+                  applesTop = q.data().applesTop;
+                  userNames = q.data().userNames;
+                }
+              });
+            if (applesTop[players.indexOf(msg.author.id)] < AppleCounter) {
+              applesTop[players.indexOf(msg.author.id)] = AppleCounter;
+              db.collection("snake").doc(msg.guild.id).update({
+                applesTop: applesTop,
+              });
+            }
             return msg.channel.send("Stopped!");
           } else if (collected.first().content === "w") {
             snakeMove(up);
@@ -423,6 +504,46 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
           return;
         });
     }
+  } else if (args[0] === "top") {
+    let players = new Array(),
+      applesTop = new Array(),
+      userNames = new Array();
+    db.collection("snake")
+      .doc(msg.guild.id)
+      .get()
+      .then((q) => {
+        if (q.exists) {
+          players = q.data().players;
+          applesTop = q.data().applesTop;
+          userNames = q.data().userNames;
+        } else {
+          db.collection("snake")
+            .doc(msg.guild.id)
+            .set({
+              players: [],
+              applesTop: [],
+              userNames: [],
+            })
+            .then(() => {
+              msg.channel.send("No players logged - Play the game first");
+              return;
+            });
+        }
+      })
+      .then(() => {
+        for (let i = 0; i < players.length; i++) {
+          for (let j = 0; j < players.length; j++) {
+            if (applesTop[j] < applesTop[j + 1]) {
+              let tmp = applesTop[j];
+              let tmp2 = userNames[j];
+              userNames[j] = userNames[j + 1];
+              applesTop[j] = applesTop[j + 1];
+              applesTop[j + 1] = tmp;
+              userNames[j + 1] = tmp2;
+            }
+          }
+        }
+      });
   }
 };
 

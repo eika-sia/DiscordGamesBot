@@ -197,7 +197,9 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
     render();
     Draw1st().catch((err) => {});
 
-    function snakeMove(direction) {
+    let EatedNow = false;
+
+    async function snakeMove(direction) {
       let TempRow = SnakePosArray[0][0];
       let TempCol = SnakePosArray[0][1];
 
@@ -229,6 +231,11 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
           SnakePosArray[i] = [TempRow, TempCol];
         }
       }
+      if (EatedNow === true) {
+        PlayingField[StorageRow][StorageCol] = snakeBody;
+        SnakePosArray.push([StorageRow, StorageCol]);
+        EatedNow = false;
+      }
     }
 
     let Direction = "";
@@ -254,80 +261,8 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
           }
 
           //? add the snake add a part on the back - done
-          let TempRow = "",
-            TempCol = "";
-          for (i = 0; i < 1; ) {
-            TempRow = SnakePosArray[SnakePosArray.length - 1][0];
-            TempCol = SnakePosArray[SnakePosArray.length - 1][1];
-            if (Direction === "w") {
-              TempRow = TempRow + 1;
-              if (PlayingField[TempRow][TempCol] === 0) {
-                i++;
-              } else {
-                TempRow = TempRow - 1;
-                TempCol = TempCol - 1;
-                if (PlayingField[TempRow][TempCol] === 0) {
-                  i++;
-                } else {
-                  TempCol = TempCol + 2;
-                  if (PlayingField[TempRow][TempCol] === 0) {
-                    i++;
-                  }
-                }
-              }
-            } else if (Direction === "s") {
-              TempRow = TempRow - 1;
-              if (PlayingField[TempRow][TempCol] === 0) {
-                i++;
-              } else {
-                TempRow = TempRow + 1;
-                TempCol = TempCol - 1;
-                if (PlayingField[TempRow][TempCol] === 0) {
-                  i++;
-                } else {
-                  TempCol = TempCol + 2;
-                  if (PlayingField[TempRow][TempCol] === 0) {
-                    i++;
-                  }
-                }
-              }
-            } else if (Direction === "d") {
-              TempCol = TempCol - 1;
-              if (PlayingField[TempRow][TempCol] === 0) {
-                i++;
-              } else {
-                TempCol = TempCol + 1;
-                TempRow = TempRow - 1;
-                if (PlayingField[TempRow][TempCol] === 0) {
-                  i++;
-                } else {
-                  TempRow = TempRow + 2;
-                  if (PlayingField[TempRow][TempCol] === 0) {
-                    i++;
-                  }
-                }
-              }
-            } else if (Direction === "a") {
-              TempCol = TempCol + 1;
-              if (PlayingField[TempRow][TempCol] === 0) {
-                i++;
-              } else {
-                TempCol = TempCol - 1;
-                TempRow = TempRow - 1;
-                if (PlayingField[TempRow][TempCol] === 0) {
-                  i++;
-                } else {
-                  TempRow = TempRow + 2;
-                  if (PlayingField[TempRow][TempCol] === 0) {
-                    i++;
-                  }
-                }
-              }
-            }
-          }
 
-          PlayingField[TempRow][TempCol] = snakeBody;
-          SnakePosArray[SnakePosArray.length] = [TempRow, TempCol];
+          EatedNow = true;
 
           render();
           AppleCounter++;
@@ -430,7 +365,9 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             }
             return msg.channel.send("Stopped!");
           } else if (collected.first().content === "w") {
-            snakeMove(up);
+            snakeMove(up).catch((err) => {
+              console.log(err);
+            });
 
             render();
             MapMsg.edit(PlayingEmbed);
@@ -438,7 +375,9 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             Direction = "w";
             Gameplay();
           } else if (collected.first().content === "s") {
-            snakeMove(down);
+            snakeMove(down).catch((err) => {
+              console.log(err);
+            });
             TempRow = SnakePosArray[0][0];
             TempCol = SnakePosArray[0][1];
             render();
@@ -447,7 +386,9 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             Direction = "s";
             Gameplay();
           } else if (collected.first().content === "a") {
-            snakeMove(left);
+            snakeMove(left).catch((err) => {
+              console.log(err);
+            });
 
             render();
             MapMsg.edit(PlayingEmbed);
@@ -455,7 +396,9 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             Direction = "a";
             Gameplay();
           } else if (collected.first().content === "d") {
-            snakeMove(right);
+            snakeMove(right).catch((err) => {
+              console.log(err);
+            });
 
             render();
             MapMsg.edit(PlayingEmbed);
@@ -466,35 +409,45 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
         })
         .catch((err) => {
           if (Direction === "w") {
-            snakeMove(up);
+            snakeMove(up).catch((err) => {
+              console.log(err);
+            });
 
             render();
             MapMsg.edit(PlayingEmbed);
 
             Gameplay();
           } else if (Direction === "s") {
-            snakeMove(down);
+            snakeMove(down).catch((err) => {
+              console.log(err);
+            });
 
             render();
             MapMsg.edit(PlayingEmbed);
 
             Gameplay();
           } else if (Direction === "a") {
-            snakeMove(left);
+            snakeMove(left).catch((err) => {
+              console.log(err);
+            });
 
             render();
             MapMsg.edit(PlayingEmbed);
 
             Gameplay();
           } else if (Direction === "d") {
-            snakeMove(right);
+            snakeMove(right).catch((err) => {
+              console.log(err);
+            });
 
             render();
             MapMsg.edit(PlayingEmbed);
 
             Gameplay();
           } else if (Direction === "") {
-            snakeMove(right);
+            snakeMove(right).catch((err) => {
+              console.log(err);
+            });
 
             render();
             MapMsg.edit(PlayingEmbed);
@@ -562,7 +515,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             },
           ])
           .setTitle("Top apples!");
-          msg.channel.send(TopApples);
+        msg.channel.send(TopApples);
       });
   }
 };

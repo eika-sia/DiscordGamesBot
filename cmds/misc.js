@@ -17,7 +17,8 @@ module.exports.run = async (bot, msg, args, db) => {
                 { name: `${prefix}mafs`, value: 'Tru equation!' },
                 { name: `${prefix}blackjack`, value: "Game of Blackjack!" },
                 { name:`${prefix}meme`, value: "Generates a meme from reddit!" },
-                { name:`${prefix}Sokoban`, value: "Starts a game of sokoban!" }
+                { name:`${prefix}Sokoban`, value: "Starts a game of sokoban!" },
+                { name: `${prefix}snake`, value: "start the snake games help!"}
             )
             .setTimestamp()
             .setFooter('What are you searching for down here?');

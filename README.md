@@ -7,7 +7,11 @@ a lot of permissions but just unselect the ones you don't want, read and send me
 making changes to my code. You can probably find better bots for any functions you see here but this one is open source and I think for an example of a simple bot.
 ## It's current uses
 
-Currently it's most comlex task is creating gradients with formating for a rename command in a Minecraft server (mc-rebels.com if you want to join). It can respond with bar (a joke) and it can bulk delete messages with prune. There are some more jokes like mafs now. I added firebase so you can change the prefix with setPrefix, each prefix must be under 2 characters. validRole doesn't relly work right now. Only server owners (and me) can access commands listed on manageHelp. You can now even get some memes with meme command! Added blackjack fully with embed messages so it looks nicer! There is a new game! Sokoban is a game where you need to push a blue box to a green box. The game is not as easy and there is a chaser who wants to stop you!
+Currently it's most comlex task is creating gradients with formating for a rename command in a Minecraft server (mc-rebels.com if you want to join). It can respond with bar (a joke) and it can bulk delete messages with prune. There are some more jokes like mafs now. I added firebase so you can change the prefix with setPrefix, each prefix must be under 2 characters. validRole doesn't relly work right now. Only server owners (and me) can access commands listed on manageHelp. You can now even get some memes with meme command! Added blackjack fully with embed messages so it looks nicer! Sokoban is a game where you need to push a blue box to a green box. The game is not as easy and there is a chaser who wants to stop you!
+
+### Latest update
+
+In the last to updates (one yesterday and one today) there was a game of snake added, Im pretty sure everyone heard about the game in general
 
 
 Plans to make this bot are mostly unknown as I do stuff to it when I want or get a fun idea.

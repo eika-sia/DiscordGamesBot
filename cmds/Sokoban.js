@@ -163,6 +163,8 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
         }
 
         //Defining some wars for later
+        let MapMsg;
+        let Alert;
         let PlayerColPos;
         let PlayerRowPos;
         let BlockColPos;
@@ -315,8 +317,13 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             MapArrayC[BlockRowPos][BlockColPos + 1] = 0;
             MapArrayC[BlockRowPos][BlockColPos - 1] = 0;
             FillMap(MapArrayC);
-            MapDraw();
-            GamePlay();
+            MapDraw().then(() => {
+              msg.react("⬅️");
+              msg.react("➡️");
+              msg.react("⬆️");
+              msg.react("⬇️");
+              msg.react("⏹️");
+            });
           }
 
           function FillMap(array) {
@@ -362,15 +369,28 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
               Map.setDescription(`${Map.description}\n`);
             }
           }
+          async function MapDraw() {
+            //msg.channel.send(Map);
+            Alert = await msg.channel.send(
+              "Please give the bot 5 seconds to prepare"
+            );
+            EvilAlive = true;
+            MapMsg = await msg.channel.send(Map);
+          }
           MapGen();
+
+          function DestroyMsg() {
+            setTimeout(function () {
+              Alert.delete();
+            }, 2000);
+          }
+          setTimeout(function () {
+            Alert.edit("You can start now!");
+            DestroyMsg();
+            return GamePlay();
+          }, 5000);
         }
         //This function will be looped untill the end of the game
-        let MapMsg;
-        async function MapDraw() {
-          //msg.channel.send(Map);
-          MapMsg = await msg.channel.send(Map);
-          EvilAlive = true;
-        }
 
         //Evil bot pathfinding
         async function pathfinding() {
@@ -387,8 +407,26 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
 
           MapArrayC[EvilRowPos][EvilColPos] = 6;
         }
+        let Lost = false;
 
         function GamePlay() {
+          let RealEnd = true;
+
+          const Wordfilter = (m) => m.author.id === msg.author.id;
+          const Reactionfilter = (reaction, user) => {
+            return true;
+          };
+
+          const WordCollector = msg.channel.createMessageCollector(Wordfilter, {
+            time: 10000,
+          });
+
+          const ReactionCollector = msg.createReactionCollector(
+            Reactionfilter,
+            {
+              time: 10000,
+            }
+          );
           //Checking for winning
           db.collection("sokoban")
             .doc(msg.guild.id)
@@ -527,7 +565,17 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                 EvilAlive === false
               ) {
                 Map.setTitle("");
-                return MapGen();
+                MapGen();
+                setTimeout(function () {
+                  Alert.edit("You can start now!");
+                  DestroyMsg();
+
+                  RealEnd = false;
+                  WordCollector.stop();
+                  ReactionCollector.stop();
+
+                  return GamePlay();
+                }, 5000);
               } else if (
                 PlayerRowPos === 0 &&
                 PlayerColPos > 3 &&
@@ -535,7 +583,17 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                 EvilAlive === false
               ) {
                 Map.setTitle("");
-                return MapGen();
+                MapGen();
+                setTimeout(function () {
+                  Alert.edit("You can start now!");
+                  DestroyMsg();
+
+                  RealEnd = false;
+                  WordCollector.stop();
+                  ReactionCollector.stop();
+
+                  return GamePlay();
+                }, 5000);
               } else if (
                 PlayerRowPos === 8 &&
                 PlayerColPos > 3 &&
@@ -543,7 +601,17 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                 EvilAlive === false
               ) {
                 Map.setTitle("");
-                return MapGen();
+                MapGen();
+                setTimeout(function () {
+                  Alert.edit("You can start now!");
+                  DestroyMsg();
+
+                  RealEnd = false;
+                  WordCollector.stop();
+                  ReactionCollector.stop();
+
+                  return GamePlay();
+                }, 5000);
               } else if (
                 PlayerColPos === 0 &&
                 PlayerRowPos > 2 &&
@@ -551,156 +619,193 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                 EvilAlive === false
               ) {
                 Map.setTitle("");
-                return MapGen();
+                MapGen();
+                setTimeout(function () {
+                  Alert.edit("You can start now!");
+                  DestroyMsg();
+
+                  RealEnd = false;
+                  WordCollector.stop();
+                  ReactionCollector.stop();
+
+                  return GamePlay();
+                }, 5000);
               }
 
               //Filter mechanic
-              const filter = (m) => m.author.id === msg.author.id;
+              ReactionCollector.on("collect", (react, user) => {
+                msg.react("⬅️");
+                msg.react("➡️");
+                msg.react("⬆️");
+                msg.react("⬇️");
+                msg.react("⏹️");
+                if (react.emoji.name === "⬆️") {
+                } else if (react.emoji.name === "⬇️") {
+                } else if (react.emoji.name === "⬅️") {
+                } else if (react.emoji.name === "➡️") {
+                } else if (react.emoji.name === "⏹️") {
+                  Game = false;
+                  totalGames[players.indexOf(msg.author.id)] += 1;
+                  db.collection("sokoban").doc(msg.guild.id).update({
+                    wins: wins,
+                    totalGames: totalGames,
+                  });
+                  Lost = true;
+                  return msg.channel.send("Game stopped!");
+                }
+              });
+              WordCollector.on("collect", (m) => {
+                if (m.content === "stop") {
+                  Game = false;
+                  totalGames[players.indexOf(msg.author.id)] += 1;
+                  db.collection("sokoban").doc(msg.guild.id).update({
+                    wins: wins,
+                    totalGames: totalGames,
+                  });
+                  Lost = true;
+                  return msg.channel.send("Game stopped!");
+                } else if (m.content === "w") {
+                  //For undo
 
-              //Waiting for a response
-              msg.channel
-                .awaitMessages(filter, {
-                  max: 1,
-                  time: 10000,
-                })
-                .then((collected) => {
-                  //one got the response do this: (I'll probably make it if statments and function the game calls)
-                  //To add a function just add an if statment, If you want so game doesn't finish just add GamePlay(); at the end
-                  if (collected.first().content === "stop") {
-                    Game = false;
-                    totalGames[players.indexOf(msg.author.id)] += 1;
-                    db.collection("sokoban").doc(msg.guild.id).update({
-                      wins: wins,
-                      totalGames: totalGames,
-                    });
-                    return msg.channel.send("Game stopped!");
-                  } else if (collected.first().content === "w") {
-                    //For undo
+                  //Moving up
+                  MapArrayC[PlayerRowPos][PlayerColPos] = 0;
+                  PlayerRowPos = PlayerRowPos - 1;
 
-                    //Moving up
-                    MapArrayC[PlayerRowPos][PlayerColPos] = 0;
-                    PlayerRowPos = PlayerRowPos - 1;
-
-                    //Checks for walls
-                    if (MapArrayC[PlayerRowPos][PlayerColPos] === 5) {
-                      PlayerRowPos = PlayerRowPos + 1;
-                    }
-                    //cehcks for target area
-                    if (MapArrayC[PlayerRowPos][PlayerColPos] === 3) {
-                      PlayerRowPos = PlayerRowPos + 1;
-                    }
-
-                    //Checks for the movable block
-                    if (
-                      PlayerRowPos === BlockRowPos &&
-                      BlockColPos === PlayerColPos
-                    ) {
-                      BlockRowPos = BlockRowPos - 1;
-                      MapArrayC[BlockRowPos][BlockColPos] = 2;
-                    }
-                    MapArrayC[PlayerRowPos][PlayerColPos] = 1;
-                    FillMap(MapArrayC);
-                    MapMsg.edit(Map);
-                    msg.channel.bulkDelete(1, true);
-                    GamePlay();
-                  } else if (collected.first().content === "a") {
-                    //For undo
-
-                    //moving left
-                    MapArrayC[PlayerRowPos][PlayerColPos] = 0;
-                    PlayerColPos = PlayerColPos - 1;
-
-                    //Checks for walls
-                    if (MapArrayC[PlayerRowPos][PlayerColPos] === 5) {
-                      PlayerColPos = PlayerColPos + 1;
-                    }
-                    //checks for target area
-                    if (MapArrayC[PlayerRowPos][PlayerColPos] === 3) {
-                      PlayerColPos = PlayerColPos + 1;
-                    }
-
-                    //Checks for the movable block
-                    if (
-                      PlayerRowPos === BlockRowPos &&
-                      BlockColPos === PlayerColPos
-                    ) {
-                      BlockColPos = BlockColPos - 1;
-                      MapArrayC[BlockRowPos][BlockColPos] = 2;
-                    }
-                    MapArrayC[PlayerRowPos][PlayerColPos] = 1;
-                    FillMap(MapArrayC);
-                    MapMsg.edit(Map);
-                    msg.channel.bulkDelete(1, true);
-                    GamePlay();
-                  } else if (collected.first().content === "s") {
-                    //For undo
-
-                    MapArrayC[PlayerRowPos][PlayerColPos] = 0;
+                  //Checks for walls
+                  if (MapArrayC[PlayerRowPos][PlayerColPos] === 5) {
                     PlayerRowPos = PlayerRowPos + 1;
-
-                    //Checks for walls
-                    if (MapArrayC[PlayerRowPos][PlayerColPos] === 5) {
-                      PlayerRowPos = PlayerRowPos - 1;
-                    }
-                    //checks for target area
-                    if (MapArrayC[PlayerRowPos][PlayerColPos] === 3) {
-                      PlayerRowPos = PlayerRowPos - 1;
-                    }
-
-                    //Checks for the movable block
-                    if (
-                      PlayerRowPos === BlockRowPos &&
-                      BlockColPos === PlayerColPos
-                    ) {
-                      BlockRowPos = BlockRowPos + 1;
-                      MapArrayC[BlockRowPos][BlockColPos] = 2;
-                    }
-                    MapArrayC[PlayerRowPos][PlayerColPos] = 1;
-                    FillMap(MapArrayC);
-                    MapMsg.edit(Map);
-                    msg.channel.bulkDelete(1, true);
-                    GamePlay();
-                  } else if (collected.first().content === "d") {
-                    //For undo
-
-                    MapArrayC[PlayerRowPos][PlayerColPos] = 0;
-                    PlayerColPos = PlayerColPos + 1;
-
-                    //Checks for walls
-                    if (MapArrayC[PlayerRowPos][PlayerColPos] === 5) {
-                      PlayerColPos = PlayerColPos - 1;
-                    }
-                    //Checks for target area
-                    if (MapArrayC[PlayerRowPos][PlayerColPos] === 3) {
-                      PlayerColPos = PlayerColPos - 1;
-                    }
-
-                    //Checks for the movable block
-                    if (
-                      PlayerRowPos === BlockRowPos &&
-                      BlockColPos === PlayerColPos
-                    ) {
-                      BlockColPos = BlockColPos + 1;
-                      MapArrayC[BlockRowPos][BlockColPos] = 2;
-                    }
-                    MapArrayC[PlayerRowPos][PlayerColPos] = 1;
-                    FillMap(MapArrayC);
-                    MapMsg.edit(Map);
-                    msg.channel.bulkDelete(1, true);
-                    GamePlay();
-                  } else if (collected.first().content === "undo") {
-                    //undo fuxtion
-                    FillMap(MapArrayP);
-                    MapMsg.edit(Map);
-                    msg.channel.bulkDelete(1, true);
-                    MapArrayC = MapArrayP.map((x) => x.slice());
-                    GamePlay();
-                  } else {
-                    msg.channel.bulkDelete(1, true);
-                    GamePlay();
                   }
-                })
-                .catch((err) => {
+                  //cehcks for target area
+                  if (MapArrayC[PlayerRowPos][PlayerColPos] === 3) {
+                    PlayerRowPos = PlayerRowPos + 1;
+                  }
+
+                  //Checks for the movable block
+                  if (
+                    PlayerRowPos === BlockRowPos &&
+                    BlockColPos === PlayerColPos
+                  ) {
+                    BlockRowPos = BlockRowPos - 1;
+                    MapArrayC[BlockRowPos][BlockColPos] = 2;
+                  }
+                  MapArrayC[PlayerRowPos][PlayerColPos] = 1;
+                  FillMap(MapArrayC);
+                  MapMsg.edit(Map);
+                  msg.channel.bulkDelete(1, true);
+
+                  RealEnd = false;
+                  WordCollector.stop();
+                  ReactionCollector.stop();
+
+                  return GamePlay();
+                } else if (m.content === "a") {
+                  //For undo
+
+                  //moving left
+                  MapArrayC[PlayerRowPos][PlayerColPos] = 0;
+                  PlayerColPos = PlayerColPos - 1;
+
+                  //Checks for walls
+                  if (MapArrayC[PlayerRowPos][PlayerColPos] === 5) {
+                    PlayerColPos = PlayerColPos + 1;
+                  }
+                  //checks for target area
+                  if (MapArrayC[PlayerRowPos][PlayerColPos] === 3) {
+                    PlayerColPos = PlayerColPos + 1;
+                  }
+
+                  //Checks for the movable block
+                  if (
+                    PlayerRowPos === BlockRowPos &&
+                    BlockColPos === PlayerColPos
+                  ) {
+                    BlockColPos = BlockColPos - 1;
+                    MapArrayC[BlockRowPos][BlockColPos] = 2;
+                  }
+                  MapArrayC[PlayerRowPos][PlayerColPos] = 1;
+                  FillMap(MapArrayC);
+                  MapMsg.edit(Map);
+                  msg.channel.bulkDelete(1, true);
+
+                  RealEnd = false;
+                  WordCollector.stop();
+                  ReactionCollector.stop();
+
+                  return GamePlay();
+                } else if (m.content === "s") {
+                  //For undo
+
+                  MapArrayC[PlayerRowPos][PlayerColPos] = 0;
+                  PlayerRowPos = PlayerRowPos + 1;
+
+                  //Checks for walls
+                  if (MapArrayC[PlayerRowPos][PlayerColPos] === 5) {
+                    PlayerRowPos = PlayerRowPos - 1;
+                  }
+                  //checks for target area
+                  if (MapArrayC[PlayerRowPos][PlayerColPos] === 3) {
+                    PlayerRowPos = PlayerRowPos - 1;
+                  }
+
+                  //Checks for the movable block
+                  if (
+                    PlayerRowPos === BlockRowPos &&
+                    BlockColPos === PlayerColPos
+                  ) {
+                    BlockRowPos = BlockRowPos + 1;
+                    MapArrayC[BlockRowPos][BlockColPos] = 2;
+                  }
+                  MapArrayC[PlayerRowPos][PlayerColPos] = 1;
+                  FillMap(MapArrayC);
+                  MapMsg.edit(Map);
+                  msg.channel.bulkDelete(1, true);
+
+                  RealEnd = false;
+                  WordCollector.stop();
+                  ReactionCollector.stop();
+
+                  return GamePlay();
+                } else if (m.content === "d") {
+                  //For undo
+
+                  MapArrayC[PlayerRowPos][PlayerColPos] = 0;
+                  PlayerColPos = PlayerColPos + 1;
+
+                  //Checks for walls
+                  if (MapArrayC[PlayerRowPos][PlayerColPos] === 5) {
+                    PlayerColPos = PlayerColPos - 1;
+                  }
+                  //Checks for target area
+                  if (MapArrayC[PlayerRowPos][PlayerColPos] === 3) {
+                    PlayerColPos = PlayerColPos - 1;
+                  }
+
+                  //Checks for the movable block
+                  if (
+                    PlayerRowPos === BlockRowPos &&
+                    BlockColPos === PlayerColPos
+                  ) {
+                    BlockColPos = BlockColPos + 1;
+                    MapArrayC[BlockRowPos][BlockColPos] = 2;
+                  }
+                  MapArrayC[PlayerRowPos][PlayerColPos] = 1;
+                  FillMap(MapArrayC);
+                  MapMsg.edit(Map);
+                  msg.channel.bulkDelete(1, true);
+
+                  RealEnd = false;
+                  WordCollector.stop();
+                  ReactionCollector.stop();
+
+                  return GamePlay();
+                } else {
+                  msg.channel.bulkDelete(1, true);
+                  return GamePlay();
+                }
+              });
+              WordCollector.on("end", () => {
+                if (Lost === true) {
+                } else if (RealEnd === true) {
                   Map.setTitle("Time expired!");
                   MapMsg.edit(Map);
                   totalGames[players.indexOf(msg.author.id)] += 1;
@@ -708,7 +813,8 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                     totalGames: totalGames,
                   });
                   Game = false;
-                });
+                }
+              });
             });
         }
       });

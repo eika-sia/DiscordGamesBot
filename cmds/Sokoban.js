@@ -651,6 +651,10 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                     totalGames: totalGames,
                   });
                   Lost = true;
+
+                  ReactionCollector.stop();
+                  WordCollector.stop();
+
                   return msg.channel.send("Game stopped!");
                 }
               });

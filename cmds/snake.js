@@ -1,6 +1,6 @@
 const Discord = require("discord.js");
 
-module.exports.run = async (bot, msg, args, db, UserId) => {
+module.exports.run = async (bot, msg, args, db, userId) => {
   /**
    * ? 1. Generate a grid, Sokobans generation should work - done
    * ? 2. Generate a starting position for food and for snake, Sokobans generation should work - done
@@ -186,16 +186,34 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
       }
     }
 
-    let MapMsg;
+    let MapMsg, Alert;
     async function Draw1st() {
       MapMsg = await msg.channel.send(PlayingEmbed);
-      Gameplay();
+      Alert = await msg.channel.send(
+        "Please wait for 5 seconds before starting inputs"
+      );
+      msg.react("⬅️");
+      msg.react("➡️");
+      msg.react("⬆️");
+      msg.react("⬇️");
+      msg.react("⏹️");
+    }
+
+    function DestroyMsg() {
+      setTimeout(function () {
+        Alert.delete();
+      }, 2000);
     }
 
     //*Starting the game
     MapGen();
     render();
     Draw1st().catch((err) => {});
+    setTimeout(function () {
+      Alert.edit("You can start now!");
+      DestroyMsg();
+      Gameplay();
+    }, 5000);
 
     let EatedNow = false;
 
@@ -241,7 +259,22 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
     let Direction = "";
     //*Main loop of the game
     let AppleCounter = 0;
+    let Lost = false;
     function Gameplay() {
+      let RealEnd = true;
+      const Wordfilter = (m) => m.author.id === msg.author.id;
+      const Reactionfilter = (reaction, user) => {
+        return true;
+      };
+
+      const WordCollector = msg.channel.createMessageCollector(Wordfilter, {
+        time: 2000,
+      });
+
+      const ReactionCollector = msg.createReactionCollector(Reactionfilter, {
+        time: 2000,
+      });
+
       //? Checks for diff stuff (Winning - apple collections, loosing - hitting the wall - eating yourself {make something fun like bit off insted of loose}) -done
       let AppleRows = ApplePosArray[0];
       let AppleCols = ApplePosArray[1];
@@ -268,6 +301,10 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
           AppleCounter++;
           PlayingEmbed.setTitle(`Eaten apples: ${AppleCounter}`);
           MapMsg.edit(PlayingEmbed);
+
+          RealEnd = false;
+          WordCollector.stop();
+          ReactionCollector.stop();
           return Gameplay();
         }
       }
@@ -301,6 +338,11 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             });
           }
 
+          RealEnd = false;
+          Lost = true;
+          WordCollector.stop();
+          ReactionCollector.stop();
+
           return MapMsg.edit(PlayingEmbed);
         }
       }
@@ -333,81 +375,95 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                 });
               }
 
+              RealEnd = false;
+              Lost = true;
+              WordCollector.stop();
+              ReactionCollector.stop();
+
               return MapMsg.edit(PlayingEmbed);
             }
           }
         }
       }
 
-      const filter = (m) => m.author.id === msg.author.id;
-      msg.channel
-        .awaitMessages(filter, {
-          max: 1,
-          time: 2000,
-        })
-        .then((collected) => {
-          if (collected.first().content === "stop") {
-            db.collection("snake")
-              .doc(msg.guild.id)
-              .get()
-              .then((q) => {
-                if (q.exists) {
-                  players = q.data().players;
-                  applesTop = q.data().applesTop;
-                  userNames = q.data().userNames;
-                }
-              });
-            if (applesTop[players.indexOf(msg.author.id)] < AppleCounter) {
-              applesTop[players.indexOf(msg.author.id)] = AppleCounter;
-              db.collection("snake").doc(msg.guild.id).update({
-                applesTop: applesTop,
-              });
-            }
-            return msg.channel.send("Stopped!");
-          } else if (collected.first().content === "w") {
-            snakeMove(up).catch((err) => {
-              console.log(err);
+      WordCollector.on("collect", (m) => {
+        if (m.content === "stop") {
+          db.collection("snake")
+            .doc(msg.guild.id)
+            .get()
+            .then((q) => {
+              if (q.exists) {
+                players = q.data().players;
+                applesTop = q.data().applesTop;
+                userNames = q.data().userNames;
+              }
             });
-
-            render();
-            MapMsg.edit(PlayingEmbed);
-            msg.channel.bulkDelete(1, true);
-            Direction = "w";
-            Gameplay();
-          } else if (collected.first().content === "s") {
-            snakeMove(down).catch((err) => {
-              console.log(err);
+          if (applesTop[players.indexOf(msg.author.id)] < AppleCounter) {
+            applesTop[players.indexOf(msg.author.id)] = AppleCounter;
+            db.collection("snake").doc(msg.guild.id).update({
+              applesTop: applesTop,
             });
-            TempRow = SnakePosArray[0][0];
-            TempCol = SnakePosArray[0][1];
-            render();
-            MapMsg.edit(PlayingEmbed);
-            msg.channel.bulkDelete(1, true);
-            Direction = "s";
-            Gameplay();
-          } else if (collected.first().content === "a") {
-            snakeMove(left).catch((err) => {
-              console.log(err);
-            });
-
-            render();
-            MapMsg.edit(PlayingEmbed);
-            msg.channel.bulkDelete(1, true);
-            Direction = "a";
-            Gameplay();
-          } else if (collected.first().content === "d") {
-            snakeMove(right).catch((err) => {
-              console.log(err);
-            });
-
-            render();
-            MapMsg.edit(PlayingEmbed);
-            msg.channel.bulkDelete(1, true);
-            Direction = "d";
-            Gameplay();
           }
-        })
-        .catch((err) => {
+          Lost = true;
+          return msg.channel.send("Stopped!");
+        } else if (m.content === "w") {
+          snakeMove(up);
+
+          render();
+          MapMsg.edit(PlayingEmbed);
+          msg.channel.bulkDelete(1, true);
+          Direction = "w";
+
+          RealEnd = false;
+          WordCollector.stop();
+          ReactionCollector.stop();
+
+          return Gameplay();
+        } else if (m.content === "s") {
+          snakeMove(down);
+
+          render();
+          MapMsg.edit(PlayingEmbed);
+          msg.channel.bulkDelete(1, true);
+          Direction = "s";
+
+          RealEnd = false;
+          WordCollector.stop();
+          ReactionCollector.stop();
+
+          return Gameplay();
+        } else if (m.content === "a") {
+          snakeMove(left);
+
+          render();
+          MapMsg.edit(PlayingEmbed);
+          msg.channel.bulkDelete(1, true);
+          Direction = "a";
+
+          RealEnd = false;
+          WordCollector.stop();
+          ReactionCollector.stop();
+
+          return Gameplay();
+        } else if (m.content === "d") {
+          snakeMove(right);
+
+          render();
+          MapMsg.edit(PlayingEmbed);
+          msg.channel.bulkDelete(1, true);
+          Direction = "d";
+
+          RealEnd = false;
+          WordCollector.stop();
+          ReactionCollector.stop();
+
+          return Gameplay();
+        }
+      });
+      //*Temporay end
+      WordCollector.on("end", () => {
+        if (Lost === true) {
+        } else if (RealEnd === true) {
           if (Direction === "w") {
             snakeMove(up).catch((err) => {
               console.log(err);
@@ -416,7 +472,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             render();
             MapMsg.edit(PlayingEmbed);
 
-            Gameplay();
+            return Gameplay();
           } else if (Direction === "s") {
             snakeMove(down).catch((err) => {
               console.log(err);
@@ -425,7 +481,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             render();
             MapMsg.edit(PlayingEmbed);
 
-            Gameplay();
+            return Gameplay();
           } else if (Direction === "a") {
             snakeMove(left).catch((err) => {
               console.log(err);
@@ -434,7 +490,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             render();
             MapMsg.edit(PlayingEmbed);
 
-            Gameplay();
+            return Gameplay();
           } else if (Direction === "d") {
             snakeMove(right).catch((err) => {
               console.log(err);
@@ -443,7 +499,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             render();
             MapMsg.edit(PlayingEmbed);
 
-            Gameplay();
+            return Gameplay();
           } else if (Direction === "") {
             snakeMove(right).catch((err) => {
               console.log(err);
@@ -452,10 +508,133 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             render();
             MapMsg.edit(PlayingEmbed);
 
-            Gameplay();
+            return Gameplay();
           }
-          return;
-        });
+        } else {
+        }
+      });
+
+      //TODO Make reactions work!
+      ReactionCollector.on("collect", (reaction, user) => {
+        if (reaction.emoji.name === "⬆️") {
+          snakeMove(up);
+
+          render();
+          MapMsg.edit(PlayingEmbed);
+          const userReactions = msg.reactions.cache.filter((reaction) =>
+            reaction.users.cache.has(userId)
+          );
+          try {
+            for (const reaction of userReactions.values()) {
+              reaction.users.remove(userId);
+            }
+          } catch (error) {
+            console.error("Failed to remove reactions.");
+          }
+          Direction = "w";
+
+          RealEnd = false;
+          WordCollector.stop();
+          ReactionCollector.stop();
+
+          return Gameplay();
+        } else if (reaction.emoji.name === "⬇️") {
+          snakeMove(down);
+
+          render();
+          MapMsg.edit(PlayingEmbed);
+          const userReactions = msg.reactions.cache.filter((reaction) =>
+            reaction.users.cache.has(userId)
+          );
+          try {
+            for (const reaction of userReactions.values()) {
+              reaction.users.remove(userId);
+            }
+          } catch (error) {
+            console.error("Failed to remove reactions.");
+          }
+          Direction = "s";
+
+          RealEnd = false;
+          WordCollector.stop();
+          ReactionCollector.stop();
+
+          return Gameplay();
+        } else if (reaction.emoji.name === "➡️") {
+          snakeMove(right);
+
+          render();
+          MapMsg.edit(PlayingEmbed);
+          const userReactions = msg.reactions.cache.filter((reaction) =>
+            reaction.users.cache.has(userId)
+          );
+          try {
+            for (const reaction of userReactions.values()) {
+              reaction.users.remove(userId);
+            }
+          } catch (error) {
+            console.error("Failed to remove reactions.");
+          }
+          Direction = "d";
+
+          RealEnd = false;
+          WordCollector.stop();
+          ReactionCollector.stop();
+
+          return Gameplay();
+        } else if (reaction.emoji.name === "⬅️") {
+          snakeMove(left);
+
+          render();
+          MapMsg.edit(PlayingEmbed);
+          const userReactions = msg.reactions.cache.filter((reaction) =>
+            reaction.users.cache.has(userId)
+          );
+          try {
+            for (const reaction of userReactions.values()) {
+              reaction.users.remove(userId);
+            }
+          } catch (error) {
+            console.error("Failed to remove reactions.");
+          }
+          Direction = "a";
+
+          RealEnd = false;
+          WordCollector.stop();
+          ReactionCollector.stop();
+
+          return Gameplay();
+        } else if (reaction.emoji.name === "⏹️") {
+          db.collection("snake")
+            .doc(msg.guild.id)
+            .get()
+            .then((q) => {
+              if (q.exists) {
+                players = q.data().players;
+                applesTop = q.data().applesTop;
+                userNames = q.data().userNames;
+              }
+            });
+          if (applesTop[players.indexOf(msg.author.id)] < AppleCounter) {
+            applesTop[players.indexOf(msg.author.id)] = AppleCounter;
+            db.collection("snake").doc(msg.guild.id).update({
+              applesTop: applesTop,
+            });
+          }
+          const userReactions = msg.reactions.cache.filter((reaction) =>
+            reaction.users.cache.has(userId)
+          );
+          try {
+            for (const reaction of userReactions.values()) {
+              reaction.users.remove(userId);
+            }
+          } catch (error) {
+            console.error("Failed to remove reactions.");
+          }
+          Lost = true;
+          return msg.channel.send("Stopped!");
+        }
+      });
     }
   } else if (args[0] === "top") {
     let players = new Array(),

@@ -1,3 +1,4 @@
 {
-    "editor.cursorBlinking": "smooth"
+    "editor.cursorBlinking": "smooth",
+    "editor.tabSize": 2
 }

@@ -1,7 +1,9 @@
-const { path } = require("dotenv/lib/env-options");
+const {
+  path
+} = require("dotenv/lib/env-options");
+const Discord = require("discord.js");
 
-module.exports.run = async (bot, msg, args, db, UserId) => {
-  const Discord = require("discord.js");
+module.exports.run = async (bot, msg, args, db, userId) => {
   //help card for the game\
   let argsF = new Array();
   argsF = args;
@@ -19,34 +21,25 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
         const SokobanHelp = new Discord.MessageEmbed()
           .setTitle("Sokoban!")
           .setDescription("You need to push boxes in designated areas!")
-          .addFields(
-            {
-              name: `${prefix}Sokoban start`,
-              value: "Start the game",
-            },
-            {
-              name: "w, a, s, d",
-              value: "move the player",
-            },
-            {
-              name: "stop",
-              value: "Stop the game (you can also win to stop it)",
-            },
-            {
-              name: "How to play?",
-              value:
-                "Enter w, a, s, d (standard controls) to move the charater over the map grid and push boxes! Write stop to stop the game",
-            },
-            {
-              name: "What are all the blocks?",
-              value:
-                ":purple_square: - wall, :regional_indicator_o: - movable block, \n ❎ - Your target, 😀 - You!",
-            },
-            {
-              name: `${prefix}Sokoban top`,
-              value: "Returns top 3 players of sokoban",
-            }
-          )
+          .addFields({
+            name: `${prefix}Sokoban start`,
+            value: "Start the game",
+          }, {
+            name: "w, a, s, d",
+            value: "move the player",
+          }, {
+            name: "stop",
+            value: "Stop the game (you can also win to stop it)",
+          }, {
+            name: "How to play?",
+            value: "Enter w, a, s, d (standard controls) to move the charater over the map grid and push boxes! Write stop to stop the game",
+          }, {
+            name: "What are all the blocks?",
+            value: ":purple_square: - wall, :regional_indicator_o: - movable block, \n ❎ - Your target, 😀 - You!",
+          }, {
+            name: `${prefix}Sokoban top`,
+            value: "Returns top 3 players of sokoban",
+          })
           .setColor("RANDOM");
         //Sending the first msgs
         msg.channel.send("Doing math in background for optimal gameplay");
@@ -90,8 +83,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
         }
         const TopWins = new Discord.MessageEmbed()
           .setColor("RANDOM")
-          .addFields([
-            {
+          .addFields([{
               name: `${playerNames[0]}:`,
               value: `${wins[0]}`,
             },
@@ -120,8 +112,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
         }
         const TopWgRatio = new Discord.MessageEmbed()
           .setColor("RANDOM")
-          .addFields([
-            {
+          .addFields([{
               name: `${playerNames2[0]}:`,
               value: `${WGratio[0]}`,
             },
@@ -176,6 +167,10 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
         let EvilColPos;
         let EvilRowPos;
         let EvilAlive;
+        const up = [-1, 0];
+        const down = [1, 0];
+        const left = [0, -1];
+        const right = [0, 1];
 
         let grid = new Array();
 
@@ -202,7 +197,17 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
           let i;
 
           //Filling in the array for an empty map
-          var MapArrayC = [[], [], [], [], [], [], [], [], []];
+          var MapArrayC = [
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            [],
+            []
+          ];
 
           function MapGen() {
             //Basic static map
@@ -254,7 +259,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             }
 
             //block
-            for (i = 0; i < 1; ) {
+            for (i = 0; i < 1;) {
               BlockColPos = ColPos(3, 7);
               BlockRowPos = RowPos(2, 6);
               if (MapArrayC[BlockRowPos][BlockColPos] === 0) {
@@ -268,7 +273,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             }
 
             //player
-            for (i = 0; i < 1; ) {
+            for (i = 0; i < 1;) {
               PlayerColPos = ColPos(2, 8);
               PlayerRowPos = RowPos(2, 6);
               if (MapArrayC[PlayerRowPos][PlayerColPos] === 0) {
@@ -278,7 +283,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             }
 
             //Target
-            for (i = 0; i < 1; ) {
+            for (i = 0; i < 1;) {
               TargetColPos = ColPos(2, 8);
               TargetRowPos = RowPos(2, 6);
               if (MapArrayC[TargetRowPos][TargetColPos] === 0) {
@@ -288,7 +293,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             }
 
             //Evil boi spawning
-            for (i = 0; i < 1; ) {
+            for (i = 0; i < 1;) {
               EvilColPos = ColPos(1, 9);
               EvilRowPos = RowPos(1, 7);
               if (MapArrayC[EvilRowPos][EvilColPos] === 0) {
@@ -303,7 +308,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
               }
             }
 
-            for (i = 0; i < 3; ) {
+            for (i = 0; i < 3;) {
               DeathCol[i] = ColPos(1, 9);
               DeathRow[i] = RowPos(1, 7);
               if (MapArrayC[DeathRow[i]][DeathCol[i]] === 0) {
@@ -317,13 +322,6 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             MapArrayC[BlockRowPos][BlockColPos + 1] = 0;
             MapArrayC[BlockRowPos][BlockColPos - 1] = 0;
             FillMap(MapArrayC);
-            MapDraw().then(() => {
-              msg.react("⬅️");
-              msg.react("➡️");
-              msg.react("⬆️");
-              msg.react("⬇️");
-              msg.react("⏹️");
-            });
           }
 
           function FillMap(array) {
@@ -378,6 +376,13 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
             MapMsg = await msg.channel.send(Map);
           }
           MapGen();
+          MapDraw().then(() => {
+            msg.react("⬅️");
+            msg.react("➡️");
+            msg.react("⬆️");
+            msg.react("⬇️");
+            msg.react("⏹️");
+          });
 
           function DestroyMsg() {
             setTimeout(function () {
@@ -409,12 +414,45 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
         }
         let Lost = false;
 
+        function Move(direction) {
+          MapArrayC[PlayerRowPos][PlayerColPos] = 0;
+          PlayerRowPos = PlayerRowPos + direction[0];
+          PlayerColPos = PlayerColPos + direction[1];
+
+          //Checks for walls
+          if (MapArrayC[PlayerRowPos][PlayerColPos] === 5) {
+            PlayerRowPos = PlayerRowPos - direction[0];
+            PlayerColPos = PlayerColPos - direction[1];
+          }
+          //cehcks for target area
+          if (MapArrayC[PlayerRowPos][PlayerColPos] === 3) {
+            PlayerRowPos = PlayerRowPos - direction[0];
+            PlayerColPos = PlayerColPos - direction[1];
+          }
+
+          //Checks for the movable block
+          if (
+            PlayerRowPos === BlockRowPos &&
+            BlockColPos === PlayerColPos
+          ) {
+            BlockRowPos = BlockRowPos + direction[0];
+            BlockColPos = BlockColPos + direction[1];
+            MapArrayC[BlockRowPos][BlockColPos] = 2;
+          }
+          MapArrayC[PlayerRowPos][PlayerColPos] = 1;
+          FillMap(MapArrayC);
+          MapMsg.edit(Map);
+
+        }
+
         function GamePlay() {
           let RealEnd = true;
 
           const Wordfilter = (m) => m.author.id === msg.author.id;
           const Reactionfilter = (reaction, user) => {
-            return true;
+            if (user != '739459677296787506') {
+              return true;
+            }
           };
 
           const WordCollector = msg.channel.createMessageCollector(Wordfilter, {
@@ -422,8 +460,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
           });
 
           const ReactionCollector = msg.createReactionCollector(
-            Reactionfilter,
-            {
+            Reactionfilter, {
               time: 10000,
             }
           );
@@ -566,34 +603,32 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
               ) {
                 Map.setTitle("");
                 MapGen();
-                setTimeout(function () {
-                  Alert.edit("You can start now!");
-                  DestroyMsg();
 
-                  RealEnd = false;
-                  WordCollector.stop();
-                  ReactionCollector.stop();
+                RealEnd = false;
+                WordCollector.stop();
+                ReactionCollector.stop();
 
-                  return GamePlay();
-                }, 5000);
+                MapMsg.edit(Map);
+                EvilAlive = true;
+
+                return GamePlay();
               } else if (
                 PlayerRowPos === 0 &&
                 PlayerColPos > 3 &&
                 PlayerColPos < 9 &&
                 EvilAlive === false
               ) {
-                Map.setTitle("");
+               Map.setTitle("");
                 MapGen();
-                setTimeout(function () {
-                  Alert.edit("You can start now!");
-                  DestroyMsg();
+                
+                RealEnd = false;
+                WordCollector.stop();
+                ReactionCollector.stop();
 
-                  RealEnd = false;
-                  WordCollector.stop();
-                  ReactionCollector.stop();
+                MapMsg.edit(Map);
+                EvilAlive = true;
 
-                  return GamePlay();
-                }, 5000);
+                return GamePlay();
               } else if (
                 PlayerRowPos === 8 &&
                 PlayerColPos > 3 &&
@@ -602,16 +637,15 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
               ) {
                 Map.setTitle("");
                 MapGen();
-                setTimeout(function () {
-                  Alert.edit("You can start now!");
-                  DestroyMsg();
+                
+                RealEnd = false;
+                WordCollector.stop();
+                ReactionCollector.stop();
 
-                  RealEnd = false;
-                  WordCollector.stop();
-                  ReactionCollector.stop();
+                MapMsg.edit(Map);
+                EvilAlive = true;
 
-                  return GamePlay();
-                }, 5000);
+                return GamePlay();
               } else if (
                 PlayerColPos === 0 &&
                 PlayerRowPos > 2 &&
@@ -620,29 +654,96 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
               ) {
                 Map.setTitle("");
                 MapGen();
-                setTimeout(function () {
-                  Alert.edit("You can start now!");
-                  DestroyMsg();
+                
+                RealEnd = false;
+                WordCollector.stop();
+                ReactionCollector.stop();
+
+                MapMsg.edit(Map);
+                EvilAlive = true;
+
+                return GamePlay();
+              }
+
+              //Filter mechanic
+              ReactionCollector.on("collect", (react, user) => {
+                if (react.emoji.name === "⬆️") {
+
+                  Move(up);
+
+                  const userReactions = msg.reactions.cache.filter((reaction) =>
+                    reaction.users.cache.has(userId)
+                  );
+                  try {
+                    for (const reaction of userReactions.values()) {
+                      reaction.users.remove(userId);
+                    }
+                  } catch (error) {
+                    console.error("Failed to remove reactions.");
+                  }
 
                   RealEnd = false;
                   WordCollector.stop();
                   ReactionCollector.stop();
 
                   return GamePlay();
-                }, 5000);
-              }
-
-              //Filter mechanic
-              ReactionCollector.on("collect", (react, user) => {
-                msg.react("⬅️");
-                msg.react("➡️");
-                msg.react("⬆️");
-                msg.react("⬇️");
-                msg.react("⏹️");
-                if (react.emoji.name === "⬆️") {
                 } else if (react.emoji.name === "⬇️") {
+                  Move(down);
+
+                  const userReactions = msg.reactions.cache.filter((reaction) =>
+                    reaction.users.cache.has(userId)
+                  );
+                  try {
+                    for (const reaction of userReactions.values()) {
+                      reaction.users.remove(userId);
+                    }
+                  } catch (error) {
+                    console.error("Failed to remove reactions.");
+                  }
+
+                  RealEnd = false;
+                  WordCollector.stop();
+                  ReactionCollector.stop();
+
+                  return GamePlay();
                 } else if (react.emoji.name === "⬅️") {
+                  Move(left);
+
+                  const userReactions = msg.reactions.cache.filter((reaction) =>
+                    reaction.users.cache.has(userId)
+                  );
+                  try {
+                    for (const reaction of userReactions.values()) {
+                      reaction.users.remove(userId);
+                    }
+                  } catch (error) {
+                    console.error("Failed to remove reactions.");
+                  }
+
+                  RealEnd = false;
+                  WordCollector.stop();
+                  ReactionCollector.stop();
+
+                  return GamePlay();
                 } else if (react.emoji.name === "➡️") {
+                  Move(right);
+
+                  const userReactions = msg.reactions.cache.filter((reaction) =>
+                    reaction.users.cache.has(userId)
+                  );
+                  try {
+                    for (const reaction of userReactions.values()) {
+                      reaction.users.remove(userId);
+                    }
+                  } catch (error) {
+                    console.error("Failed to remove reactions.");
+                  }
+
+                  RealEnd = false;
+                  WordCollector.stop();
+                  ReactionCollector.stop();
+
+                  return GamePlay();
                 } else if (react.emoji.name === "⏹️") {
                   Game = false;
                   totalGames[players.indexOf(msg.author.id)] += 1;
@@ -669,137 +770,43 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                   Lost = true;
                   return msg.channel.send("Game stopped!");
                 } else if (m.content === "w") {
-                  //For undo
-
-                  //Moving up
-                  MapArrayC[PlayerRowPos][PlayerColPos] = 0;
-                  PlayerRowPos = PlayerRowPos - 1;
-
-                  //Checks for walls
-                  if (MapArrayC[PlayerRowPos][PlayerColPos] === 5) {
-                    PlayerRowPos = PlayerRowPos + 1;
-                  }
-                  //cehcks for target area
-                  if (MapArrayC[PlayerRowPos][PlayerColPos] === 3) {
-                    PlayerRowPos = PlayerRowPos + 1;
-                  }
-
-                  //Checks for the movable block
-                  if (
-                    PlayerRowPos === BlockRowPos &&
-                    BlockColPos === PlayerColPos
-                  ) {
-                    BlockRowPos = BlockRowPos - 1;
-                    MapArrayC[BlockRowPos][BlockColPos] = 2;
-                  }
-                  MapArrayC[PlayerRowPos][PlayerColPos] = 1;
-                  FillMap(MapArrayC);
-                  MapMsg.edit(Map);
-                  msg.channel.bulkDelete(1, true);
+                  Move(up);
 
                   RealEnd = false;
                   WordCollector.stop();
                   ReactionCollector.stop();
+
+                  msg.channel.bulkDelete(1, true);
 
                   return GamePlay();
                 } else if (m.content === "a") {
-                  //For undo
-
-                  //moving left
-                  MapArrayC[PlayerRowPos][PlayerColPos] = 0;
-                  PlayerColPos = PlayerColPos - 1;
-
-                  //Checks for walls
-                  if (MapArrayC[PlayerRowPos][PlayerColPos] === 5) {
-                    PlayerColPos = PlayerColPos + 1;
-                  }
-                  //checks for target area
-                  if (MapArrayC[PlayerRowPos][PlayerColPos] === 3) {
-                    PlayerColPos = PlayerColPos + 1;
-                  }
-
-                  //Checks for the movable block
-                  if (
-                    PlayerRowPos === BlockRowPos &&
-                    BlockColPos === PlayerColPos
-                  ) {
-                    BlockColPos = BlockColPos - 1;
-                    MapArrayC[BlockRowPos][BlockColPos] = 2;
-                  }
-                  MapArrayC[PlayerRowPos][PlayerColPos] = 1;
-                  FillMap(MapArrayC);
-                  MapMsg.edit(Map);
-                  msg.channel.bulkDelete(1, true);
+                  Move(left);
 
                   RealEnd = false;
                   WordCollector.stop();
                   ReactionCollector.stop();
+
+                  msg.channel.bulkDelete(1, true);
 
                   return GamePlay();
                 } else if (m.content === "s") {
-                  //For undo
-
-                  MapArrayC[PlayerRowPos][PlayerColPos] = 0;
-                  PlayerRowPos = PlayerRowPos + 1;
-
-                  //Checks for walls
-                  if (MapArrayC[PlayerRowPos][PlayerColPos] === 5) {
-                    PlayerRowPos = PlayerRowPos - 1;
-                  }
-                  //checks for target area
-                  if (MapArrayC[PlayerRowPos][PlayerColPos] === 3) {
-                    PlayerRowPos = PlayerRowPos - 1;
-                  }
-
-                  //Checks for the movable block
-                  if (
-                    PlayerRowPos === BlockRowPos &&
-                    BlockColPos === PlayerColPos
-                  ) {
-                    BlockRowPos = BlockRowPos + 1;
-                    MapArrayC[BlockRowPos][BlockColPos] = 2;
-                  }
-                  MapArrayC[PlayerRowPos][PlayerColPos] = 1;
-                  FillMap(MapArrayC);
-                  MapMsg.edit(Map);
-                  msg.channel.bulkDelete(1, true);
+                  Move(down);
 
                   RealEnd = false;
                   WordCollector.stop();
                   ReactionCollector.stop();
+
+                  msg.channel.bulkDelete(1, true);
 
                   return GamePlay();
                 } else if (m.content === "d") {
-                  //For undo
-
-                  MapArrayC[PlayerRowPos][PlayerColPos] = 0;
-                  PlayerColPos = PlayerColPos + 1;
-
-                  //Checks for walls
-                  if (MapArrayC[PlayerRowPos][PlayerColPos] === 5) {
-                    PlayerColPos = PlayerColPos - 1;
-                  }
-                  //Checks for target area
-                  if (MapArrayC[PlayerRowPos][PlayerColPos] === 3) {
-                    PlayerColPos = PlayerColPos - 1;
-                  }
-
-                  //Checks for the movable block
-                  if (
-                    PlayerRowPos === BlockRowPos &&
-                    BlockColPos === PlayerColPos
-                  ) {
-                    BlockColPos = BlockColPos + 1;
-                    MapArrayC[BlockRowPos][BlockColPos] = 2;
-                  }
-                  MapArrayC[PlayerRowPos][PlayerColPos] = 1;
-                  FillMap(MapArrayC);
-                  MapMsg.edit(Map);
-                  msg.channel.bulkDelete(1, true);
+                  Move(right);
 
                   RealEnd = false;
                   WordCollector.stop();
                   ReactionCollector.stop();
+
+                  msg.channel.bulkDelete(1, true);
 
                   return GamePlay();
                 } else {
@@ -808,8 +815,7 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
                 }
               });
               WordCollector.on("end", () => {
-                if (Lost === true) {
-                } else if (RealEnd === true) {
+                if (Lost === true) {} else if (RealEnd === true) {
                   Map.setTitle("Time expired!");
                   MapMsg.edit(Map);
                   totalGames[players.indexOf(msg.author.id)] += 1;

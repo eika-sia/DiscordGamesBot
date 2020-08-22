@@ -9,7 +9,8 @@ module.exports.run = async (bot, msg, args, db, UserId) => {
       {
         name: "roro, trapz and lucii",
         value: "Helped test everything better than I could",
-      }
+      },
+      { name: 'Bornaj', value: "Helped with theory for bots games"}
     )
     .setAuthor("The dev");
   msg.channel.send(embed);

@@ -12,11 +12,11 @@
 
   ### Adding it
 
-    Bot is simply add with this [link](https://discord.com/api/oauth2/authorize?client_id=738693849051824160&permissions=1073741815&scope=bot). For the bot to run all it's features properly you need to allow it: read and send messages, manage messages.
+  Bot is simply add with this [link](https://discord.com/api/oauth2/authorize?client_id=738693849051824160&permissions=1073741815&scope=bot). For the bot to run all it's features properly you need to allow it: read and send messages, manage messages.
 
   ### So what are all the features I'm talking about?
 
-    Bot can play 3 different games: blackjack, sokoban, snake. Each game has it's own help cards once you run them, everything can be found with &help. Prefix is changable, default is "&". It can send you memes, temporarly mute members and delete messages in bulk.
+  Bot can play 3 different games: blackjack, sokoban, snake. Each game has it's own help cards once you run them, everything can be found with &help. Prefix is changable, default is "&". It can send you memes, temporarly mute members and delete messages in bulk.
 
 ## Can I use your code?
 

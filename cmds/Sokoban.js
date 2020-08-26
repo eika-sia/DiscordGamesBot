@@ -1,6 +1,4 @@
-const {
-  path
-} = require("dotenv/lib/env-options");
+const { path } = require("dotenv/lib/env-options");
 const Discord = require("discord.js");
 
 module.exports.run = async (bot, msg, args, db, userId) => {
@@ -21,25 +19,34 @@ module.exports.run = async (bot, msg, args, db, userId) => {
         const SokobanHelp = new Discord.MessageEmbed()
           .setTitle("Sokoban!")
           .setDescription("You need to push boxes in designated areas!")
-          .addFields({
-            name: `${prefix}Sokoban start`,
-            value: "Start the game",
-          }, {
-            name: "w, a, s, d",
-            value: "move the player",
-          }, {
-            name: "stop",
-            value: "Stop the game (you can also win to stop it)",
-          }, {
-            name: "How to play?",
-            value: "Enter w, a, s, d (standard controls) to move the charater over the map grid and push boxes! Write stop to stop the game",
-          }, {
-            name: "What are all the blocks?",
-            value: ":purple_square: - wall, :regional_indicator_o: - movable block, \n ❎ - Your target, 😀 - You!",
-          }, {
-            name: `${prefix}Sokoban top`,
-            value: "Returns top 3 players of sokoban",
-          })
+          .addFields(
+            {
+              name: `${prefix}Sokoban start`,
+              value: "Start the game",
+            },
+            {
+              name: "w, a, s, d",
+              value: "move the player",
+            },
+            {
+              name: "stop",
+              value: "Stop the game (you can also win to stop it)",
+            },
+            {
+              name: "How to play?",
+              value:
+                "Enter w, a, s, d (standard controls) to move the charater over the map grid and push boxes! Write stop to stop the game",
+            },
+            {
+              name: "What are all the blocks?",
+              value:
+                ":purple_square: - wall, :regional_indicator_o: - movable block, \n ❎ - Your target, 😀 - You!",
+            },
+            {
+              name: `${prefix}Sokoban top`,
+              value: "Returns top 3 players of sokoban",
+            }
+          )
           .setColor("RANDOM");
         //Sending the first msgs
         msg.channel.send("Doing math in background for optimal gameplay");
@@ -83,7 +90,8 @@ module.exports.run = async (bot, msg, args, db, userId) => {
         }
         const TopWins = new Discord.MessageEmbed()
           .setColor("RANDOM")
-          .addFields([{
+          .addFields([
+            {
               name: `${playerNames[0]}:`,
               value: `${wins[0]}`,
             },
@@ -112,7 +120,8 @@ module.exports.run = async (bot, msg, args, db, userId) => {
         }
         const TopWgRatio = new Discord.MessageEmbed()
           .setColor("RANDOM")
-          .addFields([{
+          .addFields([
+            {
               name: `${playerNames2[0]}:`,
               value: `${WGratio[0]}`,
             },
@@ -197,17 +206,7 @@ module.exports.run = async (bot, msg, args, db, userId) => {
           let i;
 
           //Filling in the array for an empty map
-          var MapArrayC = [
-            [],
-            [],
-            [],
-            [],
-            [],
-            [],
-            [],
-            [],
-            []
-          ];
+          var MapArrayC = [[], [], [], [], [], [], [], [], []];
 
           function MapGen() {
             //Basic static map
@@ -259,7 +258,7 @@ module.exports.run = async (bot, msg, args, db, userId) => {
             }
 
             //block
-            for (i = 0; i < 1;) {
+            for (i = 0; i < 1; ) {
               BlockColPos = ColPos(3, 7);
               BlockRowPos = RowPos(2, 6);
               if (MapArrayC[BlockRowPos][BlockColPos] === 0) {
@@ -273,7 +272,7 @@ module.exports.run = async (bot, msg, args, db, userId) => {
             }
 
             //player
-            for (i = 0; i < 1;) {
+            for (i = 0; i < 1; ) {
               PlayerColPos = ColPos(2, 8);
               PlayerRowPos = RowPos(2, 6);
               if (MapArrayC[PlayerRowPos][PlayerColPos] === 0) {
@@ -283,7 +282,7 @@ module.exports.run = async (bot, msg, args, db, userId) => {
             }
 
             //Target
-            for (i = 0; i < 1;) {
+            for (i = 0; i < 1; ) {
               TargetColPos = ColPos(2, 8);
               TargetRowPos = RowPos(2, 6);
               if (MapArrayC[TargetRowPos][TargetColPos] === 0) {
@@ -293,7 +292,7 @@ module.exports.run = async (bot, msg, args, db, userId) => {
             }
 
             //Evil boi spawning
-            for (i = 0; i < 1;) {
+            for (i = 0; i < 1; ) {
               EvilColPos = ColPos(1, 9);
               EvilRowPos = RowPos(1, 7);
               if (MapArrayC[EvilRowPos][EvilColPos] === 0) {
@@ -308,7 +307,7 @@ module.exports.run = async (bot, msg, args, db, userId) => {
               }
             }
 
-            for (i = 0; i < 3;) {
+            for (i = 0; i < 3; ) {
               DeathCol[i] = ColPos(1, 9);
               DeathRow[i] = RowPos(1, 7);
               if (MapArrayC[DeathRow[i]][DeathCol[i]] === 0) {
@@ -431,10 +430,7 @@ module.exports.run = async (bot, msg, args, db, userId) => {
           }
 
           //Checks for the movable block
-          if (
-            PlayerRowPos === BlockRowPos &&
-            BlockColPos === PlayerColPos
-          ) {
+          if (PlayerRowPos === BlockRowPos && BlockColPos === PlayerColPos) {
             BlockRowPos = BlockRowPos + direction[0];
             BlockColPos = BlockColPos + direction[1];
             MapArrayC[BlockRowPos][BlockColPos] = 2;
@@ -442,7 +438,6 @@ module.exports.run = async (bot, msg, args, db, userId) => {
           MapArrayC[PlayerRowPos][PlayerColPos] = 1;
           FillMap(MapArrayC);
           MapMsg.edit(Map);
-
         }
 
         function GamePlay() {
@@ -450,8 +445,14 @@ module.exports.run = async (bot, msg, args, db, userId) => {
 
           const Wordfilter = (m) => m.author.id === msg.author.id;
           const Reactionfilter = (reaction, user) => {
-            if (user != '739459677296787506') {
-              return true;
+            if (user != "739459677296787506") {
+              let tempUser = String(user);
+              tempUser = tempUser.slice(0, tempUser.length - 1);
+              tempUser = tempUser.slice(1);
+              tempUser = tempUser.slice(1);
+              if (tempUser === userId) {
+                return true;
+              }
             }
           };
 
@@ -460,7 +461,8 @@ module.exports.run = async (bot, msg, args, db, userId) => {
           });
 
           const ReactionCollector = msg.createReactionCollector(
-            Reactionfilter, {
+            Reactionfilter,
+            {
               time: 10000,
             }
           );
@@ -618,9 +620,9 @@ module.exports.run = async (bot, msg, args, db, userId) => {
                 PlayerColPos < 9 &&
                 EvilAlive === false
               ) {
-               Map.setTitle("");
+                Map.setTitle("");
                 MapGen();
-                
+
                 RealEnd = false;
                 WordCollector.stop();
                 ReactionCollector.stop();
@@ -637,7 +639,7 @@ module.exports.run = async (bot, msg, args, db, userId) => {
               ) {
                 Map.setTitle("");
                 MapGen();
-                
+
                 RealEnd = false;
                 WordCollector.stop();
                 ReactionCollector.stop();
@@ -654,7 +656,7 @@ module.exports.run = async (bot, msg, args, db, userId) => {
               ) {
                 Map.setTitle("");
                 MapGen();
-                
+
                 RealEnd = false;
                 WordCollector.stop();
                 ReactionCollector.stop();
@@ -668,7 +670,6 @@ module.exports.run = async (bot, msg, args, db, userId) => {
               //Filter mechanic
               ReactionCollector.on("collect", (react, user) => {
                 if (react.emoji.name === "⬆️") {
-
                   Move(up);
 
                   const userReactions = msg.reactions.cache.filter((reaction) =>
@@ -815,7 +816,8 @@ module.exports.run = async (bot, msg, args, db, userId) => {
                 }
               });
               WordCollector.on("end", () => {
-                if (Lost === true) {} else if (RealEnd === true) {
+                if (Lost === true) {
+                } else if (RealEnd === true) {
                   Map.setTitle("Time expired!");
                   MapMsg.edit(Map);
                   totalGames[players.indexOf(msg.author.id)] += 1;
@@ -832,5 +834,5 @@ module.exports.run = async (bot, msg, args, db, userId) => {
 };
 
 module.exports.help = {
-  name: "Sokoban",
+  name: "sokoban",
 };

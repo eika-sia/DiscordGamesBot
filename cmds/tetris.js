@@ -142,24 +142,24 @@ module.exports.run = async (bot, msg, args, db, userId) => {
           number: 4,
           positions: {
             turn0: [
-              [0, -1],
-              [-1, 1],
-              [0, 1],
+              [-1, 0],
+              [1, -1],
+              [1, 0],
             ],
             turn1: [
-              [1, 0],
+              [0, 1],
               [1, 1],
-              [-1, 0],
+              [0, -1],
             ],
             turn2: [
-              [1, 1],
+              [-1, 1],
               [0, -1],
               [0, 1],
             ],
             turn3: [
-              [1, -1],
-              [-1, 0],
-              [1, 0],
+              [-1, -1],
+              [0, -1],
+              [0, 1],
             ],
           },
           InBag: true,
@@ -170,24 +170,24 @@ module.exports.run = async (bot, msg, args, db, userId) => {
           number: 5,
           positions: {
             turn0: [
-              [0, -1],
-              [0, 1],
+              [-1, 0],
+              [1, 0],
               [-1, -1],
             ],
             turn1: [
-              [1, 0],
-              [-1, 1],
-              [-1, 0],
-            ],
-            turn2: [
+              [0, 1],
               [1, -1],
               [0, -1],
-              [0, 1],
+            ],
+            turn2: [
+              [-1, 1],
+              [-1, 0],
+              [1, 0],
             ],
             turn3: [
-              [1, 0],
-              [-1, 0],
-              [1, -1],
+              [0, 1],
+              [0, -1],
+              [-1, 1],
             ],
           },
           InBag: true,
@@ -199,21 +199,21 @@ module.exports.run = async (bot, msg, args, db, userId) => {
           positions: {
             turn0: [
               [0, -1],
-              [0, 1],
+              [1, 0],
               [-1, 0],
             ],
             turn1: [
               [1, 0],
               [0, 1],
-              [-1, 0],
+              [0, -1],
             ],
             turn2: [
               [1, 0],
-              [0, -1],
+              [-1, 0],
               [0, 1],
             ],
             turn3: [
-              [1, 0],
+              [0, 1],
               [0, -1],
               [-1, 0],
             ],
@@ -468,10 +468,11 @@ module.exports.run = async (bot, msg, args, db, userId) => {
       function DropDown(obj) {
         while (obj.InBag === true) {
           MoveDown(obj);
-        } 
+        }
       }
 
       let ReactionCollector;
+      let score = 0;
       function Gameplay() {
         if (CurrentObj.InBag === false) {
           Orientation = 0;
@@ -482,11 +483,11 @@ module.exports.run = async (bot, msg, args, db, userId) => {
             GeneratePieces();
           }
           let EmptyRow = [];
-          for (let q = 0; q<TableCols; q++) {
+          for (let q = 0; q < TableCols; q++) {
             EmptyRow[q] = bg;
           }
           EmptyRow[0] = wall;
-          EmptyRow[EmptyRow.length-1] = wall;
+          EmptyRow[EmptyRow.length - 1] = wall;
           for (let p = TableRows - 2; p > 0; p--) {
             let NofBlcoks = 0;
             for (j = 1; j < TableCols - 1; j++) {
@@ -505,16 +506,18 @@ module.exports.run = async (bot, msg, args, db, userId) => {
                 PlayingField[TableRows - 1][s] = wall;
                 //console.log("4")
               }
-              render();
-              MapMsg.edit(PlayingEmbed);
               //console.log("5")
               NofBlcoks = 0;
 
               for (let t = p; t > 1; t--) {
-                PlayingField[t] = PlayingField[t-1];
-                PlayingField[t-1] = EmptyRow;
+                PlayingField[t] = PlayingField[t - 1];
+                PlayingField[t - 1] = EmptyRow;
               }
+              score = score + 100;
+              //sconsole.log(score);
             }
+            render();
+            MapMsg.edit(PlayingEmbed);
           }
           //console.log("Success2")
           return Gameplay();

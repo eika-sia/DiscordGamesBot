@@ -115,7 +115,7 @@ module.exports.run = async (bot, msg, args, db, userId) => {
           positions: {
             turn0: [
               [0, -1],
-              [0, 1],
+              [1, 0],
               [-1, -1],
             ],
             turn1: [
@@ -124,9 +124,9 @@ module.exports.run = async (bot, msg, args, db, userId) => {
               [1, -1],
             ],
             turn2: [
+              [0, -1],
               [1, 0],
-              [0, 1],
-              [1, -1],
+              [-1, -1],
             ],
             turn3: [
               [1, 0],

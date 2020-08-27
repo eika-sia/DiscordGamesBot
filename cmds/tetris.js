@@ -311,6 +311,7 @@ module.exports.run = async (bot, msg, args, db, userId) => {
       msg.react("➡️");
       msg.react("↪️");
       msg.react("↩️");
+      msg.react("⬇️");
       msg.react("⏹️");
       function DestroyMsg() {
         setTimeout(function () {
@@ -462,6 +463,12 @@ module.exports.run = async (bot, msg, args, db, userId) => {
 
           PlayingField[TempRow][TempCol] = bg;
         }
+      }
+
+      function DropDown(obj) {
+        while (obj.InBag === true) {
+          MoveDown(obj);
+        } 
       }
 
       let ReactionCollector;
@@ -646,6 +653,28 @@ module.exports.run = async (bot, msg, args, db, userId) => {
             ReactionCollector.stop();
 
             return;
+          } else if (reaction.emoji.name === "⬇️") {
+            ClearObj(CurrentObj);
+            DropDown(CurrentObj);
+
+            const userReactions = msg.reactions.cache.filter((reaction) =>
+              reaction.users.cache.has(userId)
+            );
+            try {
+              for (const reaction of userReactions.values()) {
+                reaction.users.remove(userId);
+              }
+            } catch (error) {
+              console.error("Failed to remove reactions.");
+            }
+
+            RenderObj(CurrentObj);
+            render();
+            MapMsg.edit(PlayingEmbed);
+
+            RealEnd = false;
+            ReactionCollector.stop();
+            return Gameplay();
           }
         });
 

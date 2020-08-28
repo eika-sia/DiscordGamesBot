@@ -444,24 +444,16 @@ module.exports.run = async (bot, msg, args, db, userId) => {
           let RealEnd = true;
 
           const Wordfilter = (m) => {
-            if (userId === "430722923419009024") {
-              return true;
-            } else {
-              return m.author.id === msg.author.id;
-            }
+            return m.author.id === msg.author.id;
           };
           const Reactionfilter = (reaction, user) => {
-            if (userId === "430722923419009024") {
-              return true;
-            } else {
-              if (user != "739459677296787506") {
-                let tempUser = String(user);
-                tempUser = tempUser.slice(0, tempUser.length - 1);
-                tempUser = tempUser.slice(1);
-                tempUser = tempUser.slice(1);
-                if (tempUser === userId) {
-                  return true;
-                }
+            if (user != "739459677296787506") {
+              let tempUser = String(user);
+              tempUser = tempUser.slice(0, tempUser.length - 1);
+              tempUser = tempUser.slice(1);
+              tempUser = tempUser.slice(1);
+              if (tempUser === userId) {
+                return true;
               }
             }
           };

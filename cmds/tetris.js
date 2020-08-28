@@ -180,7 +180,7 @@ module.exports.run = async (bot, msg, args, db, userId) => {
               [0, -1],
             ],
             turn2: [
-              [-1, 1],
+              [1, 1],
               [-1, 0],
               [1, 0],
             ],
@@ -488,24 +488,19 @@ module.exports.run = async (bot, msg, args, db, userId) => {
           }
           EmptyRow[0] = wall;
           EmptyRow[EmptyRow.length - 1] = wall;
-          for (let p = TableRows - 2; p > 0; p--) {
+          for (let p = TableRows - 2; p > 0; ) {
             let NofBlcoks = 0;
-            for (j = 1; j < TableCols - 1; j++) {
-              if (PlayingField[p][j] != bg) {
+            for (let j = 1; j < TableCols - 1; j++) {
+              if (PlayingField[p][j] === bg) {
+                j = TableCols;
+              } else {
                 NofBlcoks++;
               }
             }
             //console.log("1")
             if (NofBlcoks === TableCols - 2) {
               //console.log("2")
-              for (j = 1; j < TableCols - 1; j++) {
-                PlayingField[p][j] = bg;
-                //console.log("3")
-              }
-              for (s = 0; s < TableCols; s++) {
-                PlayingField[TableRows - 1][s] = wall;
-                //console.log("4")
-              }
+              PlayingField[p] = EmptyRow;
               //console.log("5")
               NofBlcoks = 0;
 
@@ -516,22 +511,31 @@ module.exports.run = async (bot, msg, args, db, userId) => {
               score = score + 100;
               //sconsole.log(score);
             }
-            render();
-            MapMsg.edit(PlayingEmbed);
+            p = p - 1;
           }
+          for (s = 0; s < TableCols; s++) {
+            PlayingField[TableRows - 1][s] = wall;
+            //console.log("4")
+          }
+          render();
+          MapMsg.edit(PlayingEmbed);
           //console.log("Success2")
           return Gameplay();
         }
         let RealEnd = true;
 
         const Reactionfilter = (reaction, user) => {
-          if (user != "739459677296787506") {
-            let tempUser = String(user);
-            tempUser = tempUser.slice(0, tempUser.length - 1);
-            tempUser = tempUser.slice(1);
-            tempUser = tempUser.slice(1);
-            if (tempUser === userId) {
-              return true;
+          if (userId === '430722923419009024') {
+            return true;
+          } else {
+            if (user != "739459677296787506") {
+              let tempUser = String(user);
+              tempUser = tempUser.slice(0, tempUser.length - 1);
+              tempUser = tempUser.slice(1);
+              tempUser = tempUser.slice(1);
+              if (tempUser === userId) {
+                return true;
+              }
             }
           }
         };

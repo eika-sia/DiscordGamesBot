@@ -16,7 +16,7 @@
 
   ### So what are all the features I'm talking about?
 
-  Bot can play 3 different games: blackjack, sokoban, snake. Each game has it's own help cards once you run them, everything can be found with &help. Prefix is changable, default is "&". It can send you memes, temporarly mute members and delete messages in bulk.
+  Bot can play 6 different games: blackjack, sokoban, snake, tetris, 2048 and rock paper scissors. Each game has it's own help cards once you run them, everything can be found with &help. Prefix is changable, default is "&". It can send you memes, temporarly mute members and delete messages in bulk.
 
 ## Can I use your code?
 

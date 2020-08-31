@@ -53,7 +53,7 @@ module.exports.run = async (bot, msg, args, db) => {
 			TempVar = TempVar + word[i];
 			PalArray[i] = TempVar;
 		}
-
+		PalArray.pop(PalArray.length-1)
 		console.log(PalArray);
 		var CommandFinal = '/rename ';
 		for (i = 0; i < PalArray.length; i++) {

@@ -49,7 +49,7 @@ module.exports.run = async (bot, msg, args, db) => {
 			TempVar = "&x&" + TempVar[0] + "&" + TempVar[1] + "&" + TempVar[2] + "&" + TempVar[3] + "&" + TempVar[4] + "&" + TempVar[5];
 			if (Bold) { TempVar = TempVar + '&l'; }
 			if (undeline) { TempVar = TempVar + '&n'; }
-			if (italic) { TempVar = TempVar + '&k'; }
+			if (italic) { TempVar = TempVar + '&o'; }
 			TempVar = TempVar + word[i];
 			PalArray[i] = TempVar;
 		}

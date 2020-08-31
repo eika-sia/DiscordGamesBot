@@ -23,7 +23,15 @@ module.exports.run = async (bot, msg, args, db, userId) => {
       //? 0, 90, 180, 270 degrees seperate, current state of the moving block arrays which move? steal snake??
       const wall = 7; //🟫
       const bg = 8; // ⬛
-      let Opiece, Ipiece, Zpiece, Spiece, Jpiece, Lpiece, Tpiece;
+      let Opiece,
+        Ipiece,
+        Zpiece,
+        Spiece,
+        Jpiece,
+        Lpiece,
+        Tpiece,
+        Dotpiece,
+        Bombpiece;
       function GeneratePieces() {
         Opiece = {
           color: "🟪",
@@ -221,6 +229,30 @@ module.exports.run = async (bot, msg, args, db, userId) => {
           InBag: true,
           PivotPos: [2, 6],
         };
+        Dotpiece = {
+          color: "⭐",
+          number: 9,
+          positions: {
+            turn0: [],
+            turn1: [],
+            turn2: [],
+            turn3: [],
+          },
+          InBag: true,
+          PivotPos: [2, 6],
+        };
+        Bombpiece = {
+          color: "💣",
+          number: 10,
+          positions: {
+            turn0: [],
+            turn1: [],
+            turn2: [],
+            turn3: [],
+          },
+          InBag: true,
+          PivotPos: [2, 6],
+        };
       }
       const left = [0, -1];
       const right = [0, 1];
@@ -296,6 +328,14 @@ module.exports.run = async (bot, msg, args, db, userId) => {
               PlayingEmbed.setDescription(
                 `${PlayingEmbed.description}${Tpiece.color}`
               );
+            } else if (PlayingField[i][j] === Dotpiece.number) {
+              PlayingEmbed.setDescription(
+                `${PlayingEmbed.description}${Dotpiece.color}`
+              );
+            } else if (PlayingField[i][j] === Bombpiece.number) {
+              PlayingEmbed.setDescription(
+                `${PlayingEmbed.description}${Bombpiece.color}`
+              );
             }
           }
           PlayingEmbed.setDescription(`${PlayingEmbed.description}\n`);
@@ -325,7 +365,7 @@ module.exports.run = async (bot, msg, args, db, userId) => {
         Gameplay();
       }, 5000);
 
-      let LeftPieces = ["O", "I", "S", "Z", "L", "J", "T"];
+      let LeftPieces = ["O", "I", "S", "Z", "L", "J", "T", "Dot", "Bomb"];
       let CurrentObj;
       function GetPiece() {
         //Removing a random piece from the list while leaving it saved!
@@ -345,9 +385,12 @@ module.exports.run = async (bot, msg, args, db, userId) => {
           CurrentObj = Lpiece;
         } else if (CurrentPiece === "J") {
           CurrentObj = Jpiece;
-        } else {
-          //CurrentPiece === "T"
+        } else if (CurrentPiece === "T") {
           CurrentObj = Tpiece;
+        } else if (CurrentPiece === "Dot") {
+          CurrentObj = Dotpiece;
+        } else if (CurrentPiece === "Bomb") {
+          CurrentObj = Bombpiece;
         }
       }
 
@@ -376,7 +419,7 @@ module.exports.run = async (bot, msg, args, db, userId) => {
           Positions = obj.positions.turn3;
         }
 
-        for (i = 0; i < 3; i++) {
+        for (i = 0; i < Positions.length; i++) {
           let TempRow = Positions[i][0];
           let TempCol = Positions[i][1];
 
@@ -425,7 +468,7 @@ module.exports.run = async (bot, msg, args, db, userId) => {
           Positions = obj.positions.turn3;
         }
 
-        for (i = 0; i < 3; i++) {
+        for (i = 0; i < Positions.length; i++) {
           let TempRow2 = Positions[i][0];
           let TempCol2 = Positions[i][1];
 
@@ -454,7 +497,7 @@ module.exports.run = async (bot, msg, args, db, userId) => {
         }
 
         PlayingField[obj.PivotPos[0]][obj.PivotPos[1]] = bg;
-        for (i = 0; i < 3; i++) {
+        for (i = 0; i < Positions.length; i++) {
           let TempRow = Positions[i][0];
           let TempCol = Positions[i][1];
 
@@ -475,11 +518,23 @@ module.exports.run = async (bot, msg, args, db, userId) => {
       let score = 0;
       function Gameplay() {
         if (CurrentObj.InBag === false) {
+          if (CurrentObj.number === 10) {
+            let TempRow = CurrentObj.PivotPos[0];
+            let TempCol = CurrentObj.PivotPos[1];
+            for (i = TempRow - 1; i < TempRow + 2; i++) {
+              for (j = TempCol - 1; j < TempCol + 2; j++) {
+                if (PlayingField[i][j] != wall) {
+                  PlayingField[i][j] = bg;
+                }
+              }
+            }
+          }
+
           Orientation = 0;
           GetPiece();
 
           if (LeftPieces.length === 0) {
-            LeftPieces = ["O", "I", "S", "Z", "L", "J", "T"];
+            LeftPieces = ["O", "I", "S", "Z", "L", "J", "T", "Dot", "Bomb"];
             GeneratePieces();
           }
           let EmptyRow = [];

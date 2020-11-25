@@ -74,15 +74,17 @@ bot.on("message", (msg) => {
     guildMemberCount: msg.guild.memberCount,
     guildName: msg.guild.name,
     //'guildOwner': msg.guild.owner.user.name,
-    guildOwnerID: msg.guild.owner.id,
+    //guildOwnerID: msg.guild.owner.id,
     guildMemberCount: msg.guild.memberCount,
-  });
+  }).catch((err) => {});
   db.collection("guilds")
     .doc(msg.guild.id)
     .get()
     .then((q) => {
       if (q.exists) {
         prefix = q.data().prefix;
+      } else {
+        prefix = "&"
       }
     })
     .then(() => {
@@ -169,8 +171,8 @@ bot.on("guildCreate", async (gData) => {
   db.collection("guilds").doc(gData.id).set({
     guildID: gData.id,
     guildName: gData.name,
-    guildOwner: gData.owner.user.username,
-    guildOwnerID: gData.owner.id,
+    //guildOwner: gData.owner.user.username,
+    //guildOwnerID: gData.owner.id,
     guildMemberCount: gData.memberCount,
     prefix: "&",
   });

@@ -197,9 +197,15 @@ bot.on("guildCreate", async (gData) => {
         playerNames: new Array(),
         wins: new Array(),
         totalGames: new Array(),
+      }).than(() => {
+        db.collection("sokoban").doc(gData.id).set({
+          players: new Array(),
+          userNames: new Array(),
+          applesTop: new Array()
+        })
       });
     });
 });
 
 // Bot login
-bot.login(process.env.token);
+bot.login("NzM4NjkzODQ5MDUxODI0MTYw.XyPoQQ.Ql7kpCsk5bGrT_Pan2PGlrFqMy4");

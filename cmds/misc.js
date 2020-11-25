@@ -18,7 +18,10 @@ module.exports.run = async (bot, msg, args, db) => {
                 { name: `${prefix}blackjack`, value: "Game of Blackjack!" },
                 { name:`${prefix}meme`, value: "Generates a meme from reddit!" },
                 { name:`${prefix}Sokoban`, value: "Starts a game of sokoban!" },
-                { name: `${prefix}snake`, value: "start the snake games help!"}
+                { name: `${prefix}snake`, value: "start the snake games help!"},
+                { name: `${prefix}tetris`, value: "start the tetris games help!"},
+                { name: `${prefix}2048`, value: "start the 2048 games help!"},
+                { name: `${prefix}rpc`, value: "start the rock, paper scissors games help!"},
             )
             .setTimestamp()
             .setFooter('What are you searching for down here?');
